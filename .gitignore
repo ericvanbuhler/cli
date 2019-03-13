@@ -1,5 +1,8 @@
 ### Node ###
 
+# alwaysAI files
+# alwaysai.*.json
+
 /coverage
 
 # Logs

@@ -23,18 +23,25 @@
     "postversion": "npm publish"
   },
   "dependencies": {
-    "@alwaysai/always-cli": "0.0.0-1",
-    "@alwaysai/web-api": "0.0.0-0"
+    "@alwaysai/always-cli": "0.0.0-2",
+    "@alwaysai/web-api": "0.0.0-0",
+    "@types/mkdirp": "0.5.2",
+    "@types/prompts": "1.2.0",
+    "@types/remote-origin-url": "2.0.0",
+    "mkdirp": "0.5.1",
+    "ora": "3.2.0",
+    "prompts": "2.0.3",
+    "remote-origin-url": "2.0.0"
   },
   "devDependencies": {
     "@alwaysai/tsconfig": "0.0.0",
     "@alwaysai/tslint-config": "0.0.0",
-    "@types/jest": "24.0.9",
-    "@types/node": "11.10.4",
-    "jest": "24.1.0",
+    "@types/jest": "24.0.11",
+    "@types/node": "11.11.2",
+    "jest": "24.5.0",
     "rimraf": "2.6.3",
     "ts-jest": "24.0.0",
-    "ts-node": "8.0.2",
+    "ts-node": "8.0.3",
     "tslint": "5.13.1",
     "typescript": "3.3.3333"
   },

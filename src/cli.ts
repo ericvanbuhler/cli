@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 import { createCommandLineInterface } from '@alwaysai/always-cli';
-import { root } from './root';
+import { alwaysai } from '.';
 
-const commandLineInterface = createCommandLineInterface(root);
+const commandLineInterface = createCommandLineInterface(alwaysai);
 commandLineInterface();
