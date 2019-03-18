@@ -5,7 +5,7 @@
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
   "bin": {
-    "alwaysai": "lib/cli.js"
+    "alwaysai": "lib/index.js"
   },
   "engines": {
     "node": ">=8.0.0"
@@ -25,24 +25,25 @@
   "dependencies": {
     "@alwaysai/always-cli": "0.0.0-2",
     "@alwaysai/web-api": "0.0.0-0",
+    "@carnesen/coded-error": "0.1.0",
     "@types/mkdirp": "0.5.2",
     "@types/prompts": "1.2.0",
     "@types/remote-origin-url": "2.0.0",
     "mkdirp": "0.5.1",
     "ora": "3.2.0",
-    "prompts": "2.0.3",
+    "prompts": "2.0.4",
     "remote-origin-url": "2.0.0"
   },
   "devDependencies": {
     "@alwaysai/tsconfig": "0.0.0",
     "@alwaysai/tslint-config": "0.0.0",
     "@types/jest": "24.0.11",
-    "@types/node": "11.11.2",
+    "@types/node": "11.11.3",
     "jest": "24.5.0",
     "rimraf": "2.6.3",
     "ts-jest": "24.0.0",
     "ts-node": "8.0.3",
-    "tslint": "5.13.1",
+    "tslint": "5.14.0",
     "typescript": "3.3.3333"
   },
   "files": [
@@ -62,7 +63,7 @@
     "name": "alwaysAI, Inc.",
     "email": "contact@alwaysai.co"
   },
-  "repository": "github:alwaysai/alwaysai-cli",
-  "homepage": "https://github.com/alwaysai/alwaysai-cli#readme",
+  "repository": "github:alwaysai/cli",
+  "homepage": "https://github.com/alwaysai/cli#readme",
   "license": "MIT"
 }
