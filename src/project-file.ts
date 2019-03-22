@@ -3,7 +3,7 @@ import { readFileSync, writeFileSync } from 'fs';
 import mkdirp = require('mkdirp');
 import { FatalError } from '@alwaysai/always-cli';
 
-export const PROJECT_FILE_NAME = 'alwaysai.project.json';
+export const APP_CONFIG_FILE_NAME = 'alwaysai.app.json';
 export const MODELS_DIR_NAME = 'alwaysai.models';
 
 export type Project = Partial<{
@@ -44,13 +44,13 @@ export function removeModelFromProjectFile(filePath: string, name: string) {
 export function checkProjectFile() {
   let config: ReturnType<typeof readProjectFile>;
   try {
-    config = readProjectFile(PROJECT_FILE_NAME);
+    config = readProjectFile(APP_CONFIG_FILE_NAME);
   } catch (ex) {
     if (ex.code !== 'ENOENT') {
       throw ex;
     }
     throw new FatalError(
-      `${PROJECT_FILE_NAME} not found. Did you run "alwaysai app init"?`,
+      `${APP_CONFIG_FILE_NAME} not found. Did you run "alwaysai app init"?`,
     );
   }
   return config;

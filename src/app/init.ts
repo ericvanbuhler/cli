@@ -1,11 +1,22 @@
-import { createLeaf, FatalError } from '@alwaysai/always-cli';
-import { yes } from './yes';
-import { writeProjectFile, PROJECT_FILE_NAME, Project } from '../project-file';
 import { existsSync, readFileSync } from 'fs';
 import { basename } from 'path';
+
 import origin = require('remote-origin-url');
-import { checkLoggedIn } from '../credentials';
 import prompts = require('prompts');
+
+import { createLeaf, FatalError } from '@alwaysai/always-cli';
+import { CredentialsStore } from '@alwaysai/cloud-api-nodejs';
+import { yes } from './yes';
+import { writeProjectFile, APP_CONFIG_FILE_NAME, Project } from '../project-file';
+
+function checkLoggedIn() {
+  const store = new CredentialsStore();
+  const credentials = store.read();
+  if (!credentials) {
+    throw new FatalError('You must be logged in to perform this action');
+  }
+  return credentials.username;
+}
 
 export const init = createLeaf({
   commandName: 'init',
@@ -14,14 +25,14 @@ export const init = createLeaf({
     yes,
   },
   async action({ yes }) {
-    const { username } = checkLoggedIn();
+    const username = checkLoggedIn();
 
-    if (existsSync(PROJECT_FILE_NAME)) {
-      const fileContents = readFileSync(PROJECT_FILE_NAME, { encoding: 'utf8' });
+    if (existsSync(APP_CONFIG_FILE_NAME)) {
+      const fileContents = readFileSync(APP_CONFIG_FILE_NAME, { encoding: 'utf8' });
       const lines = [
         "You're already in an alwaysAI app directory!",
         '',
-        `Your ${PROJECT_FILE_NAME} is:`,
+        `Your ${APP_CONFIG_FILE_NAME} is:`,
         fileContents,
       ];
       throw new FatalError(lines.join('\n'));
@@ -36,7 +47,7 @@ export const init = createLeaf({
 
     let fileContents: string;
     if (yes) {
-      fileContents = writeProjectFile(PROJECT_FILE_NAME, defaultConfig);
+      fileContents = writeProjectFile(APP_CONFIG_FILE_NAME, defaultConfig);
     } else {
       const answers = await prompts([
         {
@@ -58,11 +69,11 @@ export const init = createLeaf({
           initial: defaultConfig.repository,
         },
       ]);
-      fileContents = writeProjectFile(PROJECT_FILE_NAME, {
+      fileContents = writeProjectFile(APP_CONFIG_FILE_NAME, {
         ...answers,
         models: {},
       });
     }
-    return `Wrote to ${PROJECT_FILE_NAME}:\n\n${fileContents}`;
+    return `Wrote to ${APP_CONFIG_FILE_NAME}:\n\n${fileContents}`;
   },
 });

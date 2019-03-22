@@ -1,6 +1,6 @@
 import { createLeaf } from '@alwaysai/always-cli';
 import {
-  PROJECT_FILE_NAME,
+  APP_CONFIG_FILE_NAME,
   checkProjectFile,
   installModelsInProjectFile,
 } from '../../project-file';
@@ -13,7 +13,7 @@ export const pullModels = createLeaf({
   async action() {
     checkProjectFile();
     await fakeSpinner('Downloading models');
-    installModelsInProjectFile(PROJECT_FILE_NAME);
+    installModelsInProjectFile(APP_CONFIG_FILE_NAME);
     console.log('Done!');
   },
 });

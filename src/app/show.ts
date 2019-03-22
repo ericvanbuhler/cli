@@ -1,5 +1,5 @@
 import { createLeaf } from '@alwaysai/always-cli';
-import { PROJECT_FILE_NAME, readProjectFile } from '../project-file';
+import { APP_CONFIG_FILE_NAME, readProjectFile } from '../project-file';
 
 export const show = createLeaf({
   commandName: 'show',
@@ -7,7 +7,7 @@ export const show = createLeaf({
   options: {},
   action() {
     try {
-      const project = readProjectFile(PROJECT_FILE_NAME);
+      const project = readProjectFile(APP_CONFIG_FILE_NAME);
       return project;
     } catch (ex) {
       if (ex.code === 'ENOENT') {

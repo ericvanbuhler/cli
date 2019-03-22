@@ -1,7 +1,7 @@
 ### Node ###
 
 # alwaysAI files
-# alwaysai.*.json
+alwaysai.*.json
 
 /coverage
 
