@@ -6,45 +6,45 @@ import { FatalError } from '@alwaysai/always-cli';
 export const APP_CONFIG_FILE_NAME = 'alwaysai.app.json';
 export const MODELS_DIR_NAME = 'alwaysai.models';
 
-export type Project = Partial<{
+export type AppConfig = Partial<{
   name: string;
   version: string;
   models: { [modelName: string]: string };
   repository: string;
 }>;
 
-export function readProjectFile(filePath: string) {
+export function readAppConfigFile(filePath: string) {
   const fileContents = readFileSync(filePath, { encoding: 'utf8' });
-  const project: Project = JSON.parse(fileContents);
-  return project;
+  const appConfig: AppConfig = JSON.parse(fileContents);
+  return appConfig;
 }
 
-export function writeProjectFile(filePath: string, project: Project) {
-  const fileContents = JSON.stringify(project, null, 2);
+export function writeAppConfigFile(filePath: string, appConfig: AppConfig) {
+  const fileContents = JSON.stringify(appConfig, null, 2);
   mkdirp.sync(dirname(filePath));
   writeFileSync(filePath, fileContents);
   return fileContents;
 }
 
-export function addModelToProjectFile(filePath: string, name: string) {
-  const project = readProjectFile(filePath);
-  project.models = project.models || {};
-  project.models[name] = '*';
-  writeProjectFile(filePath, project);
+export function addModelToAppConfigFile(filePath: string, name: string) {
+  const appConfig = readAppConfigFile(filePath);
+  appConfig.models = appConfig.models || {};
+  appConfig.models[name] = '*';
+  writeAppConfigFile(filePath, appConfig);
 }
 
-export function removeModelFromProjectFile(filePath: string, name: string) {
-  const project = readProjectFile(filePath);
-  if (project.models) {
-    delete project.models[name];
+export function removeModelFromAppConfigFile(filePath: string, name: string) {
+  const appConfig = readAppConfigFile(filePath);
+  if (appConfig.models) {
+    delete appConfig.models[name];
   }
-  writeProjectFile(filePath, project);
+  writeAppConfigFile(filePath, appConfig);
 }
 
-export function checkProjectFile() {
-  let config: ReturnType<typeof readProjectFile>;
+export function checkAppConfigFile() {
+  let config: ReturnType<typeof readAppConfigFile>;
   try {
-    config = readProjectFile(APP_CONFIG_FILE_NAME);
+    config = readAppConfigFile(APP_CONFIG_FILE_NAME);
   } catch (ex) {
     if (ex.code !== 'ENOENT') {
       throw ex;
@@ -56,8 +56,8 @@ export function checkProjectFile() {
   return config;
 }
 
-export async function installModelsInProjectFile(filePath: string) {
-  const config = readProjectFile(filePath);
+export async function installModelsInAppConfigFile(filePath: string) {
+  const config = readAppConfigFile(filePath);
   const appDir = dirname(filePath);
   const modelsDir = join(appDir, MODELS_DIR_NAME);
   mkdirp.sync(modelsDir);

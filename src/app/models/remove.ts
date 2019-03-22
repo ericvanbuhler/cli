@@ -1,10 +1,10 @@
 import { createLeaf, createStringArrayOption, withRequired } from '@alwaysai/always-cli';
 import {
   APP_CONFIG_FILE_NAME,
-  checkProjectFile,
-  installModelsInProjectFile,
-  removeModelFromProjectFile,
-} from '../../project-file';
+  checkAppConfigFile,
+  installModelsInAppConfigFile,
+  removeModelFromAppConfigFile,
+} from '../../app-config-file';
 import { fakeSpinner } from '../../fake-spinner';
 
 const names = withRequired(
@@ -15,16 +15,16 @@ const names = withRequired(
 
 export const removeModels = createLeaf({
   commandName: 'remove',
-  description: `Remove alwaysAI model(s) from this project`,
+  description: `Remove alwaysAI model(s) from this App`,
   options: {
     names,
   },
   async action({ names }) {
-    checkProjectFile();
+    checkAppConfigFile();
     for (const name of names) {
       await fakeSpinner(`Remove model "${name}"`);
-      removeModelFromProjectFile(APP_CONFIG_FILE_NAME, name);
-      installModelsInProjectFile(APP_CONFIG_FILE_NAME);
+      removeModelFromAppConfigFile(APP_CONFIG_FILE_NAME, name);
+      installModelsInAppConfigFile(APP_CONFIG_FILE_NAME);
     }
     console.log('Done!');
   },

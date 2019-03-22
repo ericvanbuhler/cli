@@ -7,7 +7,7 @@ import prompts = require('prompts');
 import { createLeaf, FatalError } from '@alwaysai/always-cli';
 import { CredentialsStore } from '@alwaysai/cloud-api-nodejs';
 import { yes } from './yes';
-import { writeProjectFile, APP_CONFIG_FILE_NAME, Project } from '../project-file';
+import { writeAppConfigFile, APP_CONFIG_FILE_NAME, AppConfig } from '../app-config-file';
 
 function checkLoggedIn() {
   const store = new CredentialsStore();
@@ -38,7 +38,7 @@ export const init = createLeaf({
       throw new FatalError(lines.join('\n'));
     }
 
-    const defaultConfig: Project = {
+    const defaultConfig: AppConfig = {
       name: `@${username}/${basename(process.cwd())}`,
       version: '0.0.0-0',
       models: {},
@@ -47,7 +47,7 @@ export const init = createLeaf({
 
     let fileContents: string;
     if (yes) {
-      fileContents = writeProjectFile(APP_CONFIG_FILE_NAME, defaultConfig);
+      fileContents = writeAppConfigFile(APP_CONFIG_FILE_NAME, defaultConfig);
     } else {
       const answers = await prompts([
         {
@@ -69,7 +69,7 @@ export const init = createLeaf({
           initial: defaultConfig.repository,
         },
       ]);
-      fileContents = writeProjectFile(APP_CONFIG_FILE_NAME, {
+      fileContents = writeAppConfigFile(APP_CONFIG_FILE_NAME, {
         ...answers,
         models: {},
       });

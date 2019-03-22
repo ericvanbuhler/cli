@@ -5,6 +5,6 @@ import { removeModels } from './remove';
 
 export const models = createBranch({
   commandName: 'models',
-  description: 'Manage models in an alwaysAI project',
+  description: 'Manage models in an alwaysAI App',
   subcommands: [pullModels, addModels, removeModels],
 });

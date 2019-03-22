@@ -1,10 +1,10 @@
 import { createLeaf, createStringArrayOption, withRequired } from '@alwaysai/always-cli';
 import {
   APP_CONFIG_FILE_NAME,
-  checkProjectFile,
-  addModelToProjectFile,
-  installModelsInProjectFile,
-} from '../../project-file';
+  checkAppConfigFile,
+  addModelToAppConfigFile,
+  installModelsInAppConfigFile,
+} from '../../app-config-file';
 import { fakeSpinner } from '../../fake-spinner';
 
 const names = withRequired(
@@ -15,16 +15,16 @@ const names = withRequired(
 
 export const addModels = createLeaf({
   commandName: 'add',
-  description: 'Add alwaysAI model(s) to this project',
+  description: 'Add alwaysAI model(s) to this app',
   options: {
     names,
   },
   async action({ names }) {
-    checkProjectFile();
+    checkAppConfigFile();
     for (const name of names) {
       await fakeSpinner(`Adding model "${name}"`);
-      addModelToProjectFile(APP_CONFIG_FILE_NAME, name);
-      installModelsInProjectFile(APP_CONFIG_FILE_NAME);
+      addModelToAppConfigFile(APP_CONFIG_FILE_NAME, name);
+      installModelsInAppConfigFile(APP_CONFIG_FILE_NAME);
     }
     console.log('Done!');
   },
