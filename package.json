@@ -24,8 +24,7 @@
   },
   "dependencies": {
     "@alwaysai/always-cli": "0.0.0-3",
-    "@alwaysai/cloud-api-cli": "0.0.0-1",
-    "@alwaysai/cloud-api-nodejs": "0.0.0-0",
+    "@alwaysai/cloud-api-nodejs": "0.0.0-1",
     "@carnesen/coded-error": "0.1.0",
     "@types/mkdirp": "0.5.2",
     "@types/prompts": "1.2.0",

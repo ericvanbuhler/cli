@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 import { createBranch, createCommandLineInterface } from '@alwaysai/always-cli';
-import { user, rpc } from '@alwaysai/cloud-api-cli';
+import { user, rpc } from '@alwaysai/cloud-api-nodejs/lib/cli';
 
 import { app } from './app';
 import { version } from './version';
