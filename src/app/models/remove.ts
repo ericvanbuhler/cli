@@ -7,23 +7,23 @@ import {
 } from '../../app-config-file';
 import { fakeSpinner } from '../../fake-spinner';
 
-const names = withRequired(
+const ids = withRequired(
   createStringArrayOption({
-    description: 'Names of models to remove',
+    description: 'ID of the model(s) to remove',
   }),
 );
 
 export const removeModels = createLeaf({
   commandName: 'remove',
-  description: `Remove alwaysAI model(s) from this App`,
+  description: `Remove model(s) from this alwaysAI app`,
   options: {
-    names,
+    ids,
   },
-  async action({ names }) {
+  async action({ ids }) {
     checkAppConfigFile();
-    for (const name of names) {
-      await fakeSpinner(`Remove model "${name}"`);
-      removeModelFromAppConfigFile(APP_CONFIG_FILE_NAME, name);
+    for (const id of ids) {
+      await fakeSpinner(`Remove model "${id}"`);
+      removeModelFromAppConfigFile(APP_CONFIG_FILE_NAME, id);
       installModelsInAppConfigFile(APP_CONFIG_FILE_NAME);
     }
     console.log('Done!');

@@ -20,11 +20,8 @@
       "program": "${workspaceFolder}/node_modules/.bin/ts-node",
       "args": [
         "src/index.ts",
-        "rpc",
-        "--methodName",
-        "throwError",
-        "--args",
-        "[\"ayyyy\", 418, \"carl\"]"
+        "app",
+        "deploy"
       ],
     },
   ]

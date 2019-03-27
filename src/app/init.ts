@@ -5,18 +5,9 @@ import origin = require('remote-origin-url');
 import prompts = require('prompts');
 
 import { createLeaf, FatalError } from '@alwaysai/always-cli';
-import { CredentialsStore } from '@alwaysai/cloud-api-nodejs';
 import { yes } from './yes';
 import { writeAppConfigFile, APP_CONFIG_FILE_NAME, AppConfig } from '../app-config-file';
-
-function checkLoggedIn() {
-  const store = new CredentialsStore();
-  const credentials = store.read();
-  if (!credentials) {
-    throw new FatalError('You must be logged in to perform this action');
-  }
-  return credentials.username;
-}
+import { checkLoggedIn } from '../check-logged-in';
 
 export const init = createLeaf({
   commandName: 'init',

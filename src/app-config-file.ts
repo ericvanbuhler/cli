@@ -26,10 +26,10 @@ export function writeAppConfigFile(filePath: string, appConfig: AppConfig) {
   return fileContents;
 }
 
-export function addModelToAppConfigFile(filePath: string, name: string) {
+export function addModelToAppConfigFile(filePath: string, modelIdentifier: string) {
   const appConfig = readAppConfigFile(filePath);
   appConfig.models = appConfig.models || {};
-  appConfig.models[name] = '*';
+  appConfig.models[modelIdentifier] = '*';
   writeAppConfigFile(filePath, appConfig);
 }
 
