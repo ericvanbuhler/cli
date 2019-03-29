@@ -5,7 +5,9 @@ export function checkLoggedIn() {
   const store = new CredentialsStore();
   const credentials = store.read();
   if (!credentials) {
-    throw new FatalError('You must be logged in to perform this action');
+    throw new FatalError(
+      'Authentication is required for this action. Please run "alwaysai user logIn"',
+    );
   }
   return credentials.username;
 }

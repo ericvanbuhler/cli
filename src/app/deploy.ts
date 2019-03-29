@@ -15,14 +15,18 @@ type DeploymentTarget = {
   password?: string;
 };
 
-const to: Option<DeploymentTarget> = {
-  placeholder: '<url>',
+const example = 'ssh://user:pass@1.2.3.4/some/path';
+const placeholder = '<url>';
+
+const to: Option<DeploymentTarget, true> = {
+  placeholder,
+  required: true,
   getDescription() {
     return 'Destination to which to deploy';
   },
   getValue(argv) {
-    if (!(argv && argv[0])) {
-      throw new UsageError('Value is required');
+    if (!argv[0]) {
+      throw new UsageError(`Expected a ${placeholder}`);
     }
     const arg0 = argv[0];
     let url: URL;
@@ -36,7 +40,7 @@ const to: Option<DeploymentTarget> = {
       throw new FatalError('Protocol must be "ssh:"');
     }
     if (!pathname) {
-      throw new FatalError('URL must include target path e.g. "ssh://1.2.3.4/some/path"');
+      throw new FatalError(`URL must include target path e.g. "${example}"`);
     }
     return {
       protocol,
@@ -57,7 +61,7 @@ export const deploy = createLeaf({
   },
   async action({ to }) {
     checkAppConfigFile();
-    const { username = 'linaro', password = 'linaro', port, hostname, pathname } = to;
+    const { username = 'alwaysai', password, port, hostname, pathname } = to;
     const sshClient = new SshClient({
       hostname,
       port,

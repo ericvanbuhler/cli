@@ -1,19 +1,21 @@
 #!/usr/bin/env node
 
-import { createBranch, createCommandLineInterface } from '@alwaysai/always-cli';
-import { user, rpc } from '@alwaysai/cloud-api-nodejs/lib/cli';
+import { createBranch, createCli, runAndExit } from '@alwaysai/always-cli';
 
 import { app } from './app';
 import { version } from './version';
 import { models } from './models';
+import { user } from './user';
+import { rpc } from './rpc';
 
-export const alwaysai = createBranch({
+const root = createBranch({
   commandName: 'alwaysai',
   description: 'Manage your alwaysAI assets and environment',
   subcommands: [app, user, models, rpc, version],
 });
 
+export const alwaysai = createCli(root);
+
 if (module === require.main) {
-  const commandLineInterface = createCommandLineInterface(alwaysai);
-  commandLineInterface();
+  runAndExit(alwaysai, ...process.argv.slice(2));
 }

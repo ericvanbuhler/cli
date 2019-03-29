@@ -7,9 +7,13 @@ export const APP_CONFIG_FILE_NAME = 'alwaysai.app.json';
 export const MODELS_DIR_NAME = 'alwaysai.models';
 
 export type AppConfig = Partial<{
+  publisher: string;
   name: string;
   version: string;
   models: { [modelName: string]: string };
+  scripts: {
+    [name: string]: string;
+  };
   repository: string;
 }>;
 

@@ -1,7 +1,8 @@
 import { createLeaf } from '@alwaysai/always-cli';
 import { createRpcClient, CredentialsStore } from '@alwaysai/cloud-api-nodejs';
-import { cloudApiUrl } from '@alwaysai/cloud-api-nodejs/lib/cli';
+
 import { ModelId } from '../model-id';
+import { cloudApiUrl } from '../cloud-api-url';
 
 export const list = createLeaf({
   commandName: 'list',

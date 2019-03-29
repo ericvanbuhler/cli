@@ -1,14 +1,9 @@
 import { NOT_FOUND } from 'http-status-codes';
 
-import {
-  createLeaf,
-  withRequired,
-  FatalError,
-  createStringArrayOption,
-} from '@alwaysai/always-cli';
+import { createLeaf, FatalError } from '@alwaysai/always-cli';
 import { createRpcClient, CredentialsStore } from '@alwaysai/cloud-api-nodejs';
-import { cloudApiUrl } from '@alwaysai/cloud-api-nodejs/lib/cli';
 
+import { cloudApiUrl } from '../../cloud-api-url';
 import {
   APP_CONFIG_FILE_NAME,
   checkAppConfigFile,
@@ -18,12 +13,7 @@ import {
 import { fakeSpinner } from '../../fake-spinner';
 import { checkLoggedIn } from '../../check-logged-in';
 import { ModelId } from '../../model-id';
-
-const ids = withRequired(
-  createStringArrayOption({
-    description: 'IDs of the models, e.g. "@alwaysai/mobilenet-ssd"',
-  }),
-);
+import { ids } from './ids';
 
 export const addModels = createLeaf({
   commandName: 'add',

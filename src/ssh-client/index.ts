@@ -1,6 +1,12 @@
 import { Client as Ssh2Client } from 'ssh2';
 import { Readable } from 'stream';
 
+import { CodedError } from '@carnesen/coded-error';
+import { readFile } from 'fs';
+import { promisify } from 'util';
+import { join } from 'path';
+import { homedir } from 'os';
+
 type Config = Partial<{
   hostname: string;
   port: number;
@@ -15,6 +21,21 @@ type ExecResult = {
   code: number;
 };
 
+const DOT_SSH_DIR = join(homedir(), '.ssh');
+
+async function readDefaultPrivateKey() {
+  try {
+    return await promisify(readFile)(join(DOT_SSH_DIR, 'id_rsa'), {
+      encoding: 'utf8',
+    });
+  } catch (ex) {
+    if (ex.code !== 'ENOENT') {
+      throw ex;
+    }
+    return undefined;
+  }
+}
+
 export class SshClient {
   private readonly ssh2 = new Ssh2Client();
   private readonly config: Config;
@@ -24,22 +45,26 @@ export class SshClient {
   }
 
   public async connect() {
+    const {
+      hostname = 'localhost',
+      username = 'alwaysai',
+      password = 'alwaysai',
+      privateKey,
+      port = 22,
+    } = this.config;
+    let defaultPrivateKey: string | undefined;
+    if (!privateKey && !password) {
+      defaultPrivateKey = await readDefaultPrivateKey();
+    }
     await new Promise((resolve, reject) => {
       this.ssh2.on('ready', () => {
         resolve();
       });
       this.ssh2.on('error', reject);
-      const {
-        hostname = 'localhost',
-        username = 'alwaysai',
-        password,
-        privateKey,
-        port = 22,
-      } = this.config;
       this.ssh2.connect({
         host: hostname,
         port,
-        privateKey,
+        privateKey: privateKey || defaultPrivateKey,
         username,
         password,
       });
@@ -68,6 +93,10 @@ export class SshClient {
 
         channel.on('close', (code: any) => {
           this.ssh2.end();
+          if (code !== 0) {
+            const message = `Remote command "${command}" exited with code ${code}`;
+            throw new CodedError(message, code, resolvedValue);
+          }
           resolvedValue.code = code;
           resolve(resolvedValue as ExecResult);
         });

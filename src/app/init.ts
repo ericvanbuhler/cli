@@ -1,5 +1,5 @@
-import { existsSync, readFileSync } from 'fs';
-import { basename } from 'path';
+import { existsSync, readFileSync, writeFileSync } from 'fs';
+import { basename, join } from 'path';
 
 import origin = require('remote-origin-url');
 import prompts = require('prompts');
@@ -8,6 +8,10 @@ import { createLeaf, FatalError } from '@alwaysai/always-cli';
 import { yes } from './yes';
 import { writeAppConfigFile, APP_CONFIG_FILE_NAME, AppConfig } from '../app-config-file';
 import { checkLoggedIn } from '../check-logged-in';
+
+const APP_PY = readFileSync(join(__dirname, '..', '..', 'assets', 'app.py'), {
+  encoding: 'utf8',
+});
 
 export const init = createLeaf({
   commandName: 'init',
@@ -19,28 +23,30 @@ export const init = createLeaf({
     const username = checkLoggedIn();
 
     if (existsSync(APP_CONFIG_FILE_NAME)) {
-      const fileContents = readFileSync(APP_CONFIG_FILE_NAME, { encoding: 'utf8' });
-      const lines = [
-        "You're already in an alwaysAI app directory!",
-        '',
-        `Your ${APP_CONFIG_FILE_NAME} is:`,
-        fileContents,
-      ];
-      throw new FatalError(lines.join('\n'));
+      throw new FatalError("You're already in an alwaysAI app directory!");
     }
 
     const defaultConfig: AppConfig = {
-      name: `@${username}/${basename(process.cwd())}`,
+      publisher: username,
+      name: basename(process.cwd()),
       version: '0.0.0-0',
       models: {},
+      scripts: {
+        start: 'python app.py',
+      },
       repository: origin.sync(),
     };
 
-    let fileContents: string;
     if (yes) {
-      fileContents = writeAppConfigFile(APP_CONFIG_FILE_NAME, defaultConfig);
+      writeAppConfigFile(APP_CONFIG_FILE_NAME, defaultConfig);
     } else {
       const answers = await prompts([
+        {
+          type: 'text',
+          name: 'publisher',
+          message: 'publisher',
+          initial: defaultConfig.publisher,
+        },
         {
           type: 'text',
           name: 'name',
@@ -56,15 +62,39 @@ export const init = createLeaf({
         {
           type: 'text',
           name: 'repository',
-          message: 'repository',
+          message: 'git repository',
           initial: defaultConfig.repository,
         },
+        {
+          type: 'text',
+          name: 'startCommand',
+          message: 'start command',
+          initial: defaultConfig.scripts!.start,
+        },
       ]);
-      fileContents = writeAppConfigFile(APP_CONFIG_FILE_NAME, {
-        ...answers,
+      const { startCommand, name, publisher, repository, version } = answers;
+      const scripts: AppConfig['scripts'] = {};
+      if (startCommand) {
+        scripts.start = startCommand;
+      }
+      writeAppConfigFile(APP_CONFIG_FILE_NAME, {
+        publisher,
+        name,
+        version,
+        scripts,
         models: {},
+        repository,
       });
     }
-    return `Wrote to ${APP_CONFIG_FILE_NAME}:\n\n${fileContents}`;
+    console.log(`Wrote ${APP_CONFIG_FILE_NAME}`);
+    try {
+      writeFileSync('app.py', APP_PY, { flag: 'wx' });
+      console.log('Wrote app.py');
+    } catch (ex) {
+      if (ex.code !== 'EEXIST') {
+        throw ex;
+      }
+      console.log('Found app.py');
+    }
   },
 });

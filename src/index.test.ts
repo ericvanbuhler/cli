@@ -1,19 +1,14 @@
-import {
-  createCommandInterface,
-  createCaughtCommandInterface,
-} from '@alwaysai/always-cli';
+import { runAndCatch } from '@alwaysai/always-cli';
+
 import { alwaysai } from '.';
 
-const commandInterface = createCommandInterface(alwaysai);
-const caughtCommandInterface = createCaughtCommandInterface(alwaysai);
-
-describe(alwaysai.commandName, () => {
+describe('index file', () => {
   it('shows usage', async () => {
-    expect(await caughtCommandInterface(['--help'])).toMatch(/usage/i);
+    expect(await runAndCatch(alwaysai, '--help')).toMatch(/usage/i);
   });
 
   it('version returns version', async () => {
     const semverRegex = /\..*\..*/;
-    expect(await commandInterface(['version'])).toMatch(semverRegex);
+    expect(await alwaysai('version')).toMatch(semverRegex);
   });
 });

@@ -1,4 +1,4 @@
-import { createLeaf, createStringArrayOption, withRequired } from '@alwaysai/always-cli';
+import { createLeaf } from '@alwaysai/always-cli';
 import {
   APP_CONFIG_FILE_NAME,
   checkAppConfigFile,
@@ -6,12 +6,7 @@ import {
   removeModelFromAppConfigFile,
 } from '../../app-config-file';
 import { fakeSpinner } from '../../fake-spinner';
-
-const ids = withRequired(
-  createStringArrayOption({
-    description: 'ID of the model(s) to remove',
-  }),
-);
+import { ids } from './ids';
 
 export const removeModels = createLeaf({
   commandName: 'remove',
