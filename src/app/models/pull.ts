@@ -9,7 +9,7 @@ import { fakeSpinner } from '../../fake-spinner';
 export const pullModels = createLeaf({
   commandName: 'pull',
   description: "Download this app's models",
-  options: {},
+  namedInputs: {},
   async action() {
     checkAppConfigFile();
     await fakeSpinner('Downloading models');

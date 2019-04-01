@@ -1,3 +1,3 @@
-import { createFlagOption } from '@alwaysai/always-cli';
+import { createFlagInput } from '@alwaysai/always-cli';
 
-export const yes = createFlagOption({ description: 'Accept default response' });
+export const yes = createFlagInput({ description: 'Accept default response' });

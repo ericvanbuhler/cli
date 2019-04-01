@@ -11,7 +11,7 @@ import { ids } from './ids';
 export const removeModels = createLeaf({
   commandName: 'remove',
   description: `Remove model(s) from this alwaysAI app`,
-  options: {
+  namedInputs: {
     ids,
   },
   async action({ ids }) {

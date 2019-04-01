@@ -8,7 +8,7 @@ import { password } from './password';
 const logIn = createLeaf({
   commandName: 'logIn',
   description: 'Log in to the alwaysAI Cloud',
-  options: {
+  namedInputs: {
     username,
     password,
     cloudApiUrl,
@@ -25,7 +25,7 @@ const logIn = createLeaf({
 const logOut = createLeaf({
   commandName: 'logOut',
   description: 'Log out of the alwaysAI Cloud',
-  options: {},
+  namedInputs: {},
   action() {
     const store = new CredentialsStore();
     const credentials = store.read();
@@ -40,7 +40,7 @@ const logOut = createLeaf({
 const show = createLeaf({
   commandName: 'show',
   description: 'Show the currently logged in user',
-  options: {},
+  namedInputs: {},
   action() {
     const store = new CredentialsStore();
     const credentials = store.read();
@@ -53,6 +53,6 @@ const show = createLeaf({
 
 export const user = createBranch({
   commandName: 'user',
-  description: 'Log in or out',
+  description: 'Log in or log out of the alwaysAI cloud',
   subcommands: [logIn, logOut, show],
 });

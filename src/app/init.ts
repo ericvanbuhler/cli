@@ -4,7 +4,7 @@ import { basename, join } from 'path';
 import origin = require('remote-origin-url');
 import prompts = require('prompts');
 
-import { createLeaf, FatalError } from '@alwaysai/always-cli';
+import { createLeaf, TerseError } from '@alwaysai/always-cli';
 import { yes } from './yes';
 import { writeAppConfigFile, APP_CONFIG_FILE_NAME, AppConfig } from '../app-config-file';
 import { checkLoggedIn } from '../check-logged-in';
@@ -15,15 +15,15 @@ const APP_PY = readFileSync(join(__dirname, '..', '..', 'assets', 'app.py'), {
 
 export const init = createLeaf({
   commandName: 'init',
-  description: 'Initialize an alwaysAI project in the current directory',
-  options: {
+  description: 'Initialize this directory as an alwaysAI application',
+  namedInputs: {
     yes,
   },
   async action({ yes }) {
     const username = checkLoggedIn();
 
     if (existsSync(APP_CONFIG_FILE_NAME)) {
-      throw new FatalError("You're already in an alwaysAI app directory!");
+      throw new TerseError("You're already in an alwaysAI app directory!");
     }
 
     const defaultConfig: AppConfig = {

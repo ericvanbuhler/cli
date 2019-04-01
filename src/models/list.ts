@@ -7,7 +7,7 @@ import { cloudApiUrl } from '../cloud-api-url';
 export const list = createLeaf({
   commandName: 'list',
   description: 'List alwaysAI models',
-  options: {
+  namedInputs: {
     cloudApiUrl,
   },
   async action({ cloudApiUrl }) {

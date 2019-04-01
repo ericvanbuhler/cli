@@ -1,4 +1,4 @@
-import { FatalError } from '@alwaysai/always-cli';
+import { TerseError } from '@alwaysai/always-cli';
 
 export type ModelId = {
   publisher: string;
@@ -10,10 +10,10 @@ export const ModelId = {
     const splits = modelId.split('/');
     const errorMessage = `Expected model ID to be of the form "@publisher/modelName"`;
     if (splits.length !== 2) {
-      throw new FatalError(errorMessage);
+      throw new TerseError(errorMessage);
     }
     if (splits[0].charAt(0) !== '@') {
-      throw new FatalError(errorMessage);
+      throw new TerseError(errorMessage);
     }
     return {
       publisher: splits[0].slice(1),

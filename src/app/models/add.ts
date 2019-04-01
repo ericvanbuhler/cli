@@ -1,6 +1,6 @@
 import { NOT_FOUND } from 'http-status-codes';
 
-import { createLeaf, FatalError } from '@alwaysai/always-cli';
+import { createLeaf, TerseError } from '@alwaysai/always-cli';
 import { createRpcClient, CredentialsStore } from '@alwaysai/cloud-api-nodejs';
 
 import { cloudApiUrl } from '../../cloud-api-url';
@@ -18,7 +18,7 @@ import { ids } from './ids';
 export const addModels = createLeaf({
   commandName: 'add',
   description: 'Add one or more alwaysAI models to this app',
-  options: {
+  namedInputs: {
     ids,
     cloudApiUrl,
   },
@@ -34,7 +34,7 @@ export const addModels = createLeaf({
         await rpcClient.getModel({ name, publisher });
       } catch (ex) {
         if (ex.code === NOT_FOUND) {
-          throw new FatalError(`Model not found: "${id}"`);
+          throw new TerseError(`Model not found: "${id}"`);
         }
         throw ex;
       }

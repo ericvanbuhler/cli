@@ -1,7 +1,7 @@
 import { dirname, join } from 'path';
 import { readFileSync, writeFileSync } from 'fs';
 import mkdirp = require('mkdirp');
-import { FatalError } from '@alwaysai/always-cli';
+import { TerseError } from '@alwaysai/always-cli';
 
 export const APP_CONFIG_FILE_NAME = 'alwaysai.app.json';
 export const MODELS_DIR_NAME = 'alwaysai.models';
@@ -53,7 +53,7 @@ export function checkAppConfigFile() {
     if (ex.code !== 'ENOENT') {
       throw ex;
     }
-    throw new FatalError(
+    throw new TerseError(
       `${APP_CONFIG_FILE_NAME} not found. Did you run "alwaysai app init"?`,
     );
   }

@@ -1,17 +1,17 @@
 import prompts = require('prompts');
 
-import { Option, FatalError } from '@alwaysai/always-cli';
+import { UsageError, Input } from '@alwaysai/always-cli';
 
 const placeholder = '<password>';
 
-export const password: Option<string, false> = {
+export const password: Input<string, false> = {
   async getValue(argv) {
     if (argv) {
       if (argv.length > 2) {
-        throw new FatalError(`Expected a single ${placeholder} value`);
+        throw new UsageError(`Expected a single ${placeholder} value`);
       }
       if (!argv[0]) {
-        throw new FatalError(`Expected a ${placeholder} value`);
+        throw new UsageError(`Expected a ${placeholder} value`);
       }
       return argv[0];
     }

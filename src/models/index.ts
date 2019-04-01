@@ -3,6 +3,6 @@ import { list } from './list';
 
 export const models = createBranch({
   commandName: 'models',
-  description: 'Tools for managing an alwaysAI app',
+  description: 'Create, search, or manage alwaysAI models',
   subcommands: [list],
 });

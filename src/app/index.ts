@@ -6,6 +6,6 @@ import { deploy } from './deploy';
 
 export const app = createBranch({
   commandName: 'app',
-  description: 'Tools for managing an alwaysAI app',
+  description: 'Create or manage an alwaysAI application',
   subcommands: [init, deploy, show, models],
 });
