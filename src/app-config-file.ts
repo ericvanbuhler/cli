@@ -4,7 +4,6 @@ import mkdirp = require('mkdirp');
 import { TerseError } from '@alwaysai/always-cli';
 
 export const APP_CONFIG_FILE_NAME = 'alwaysai.app.json';
-export const MODELS_DIR_NAME = 'alwaysai.models';
 
 export type AppConfig = Partial<{
   publisher: string;
@@ -61,16 +60,7 @@ export function checkAppConfigFile() {
 }
 
 export async function installModelsInAppConfigFile(filePath: string) {
-  const config = readAppConfigFile(filePath);
-  const appDir = dirname(filePath);
-  const modelsDir = join(appDir, MODELS_DIR_NAME);
-  mkdirp.sync(modelsDir);
-  const { models } = config;
-  if (models) {
-    for (const [modelName, modelVersion] of Object.entries(models)) {
-      mkdirp.sync(join(modelsDir, `${modelName}-${modelVersion}`));
-    }
-  }
+  readAppConfigFile(filePath);
 }
 
 export async function uninstallModels(_: string) {}
