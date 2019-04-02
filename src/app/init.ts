@@ -14,12 +14,12 @@ const APP_PY = readFileSync(join(__dirname, '..', '..', 'assets', 'app.py'), {
 });
 
 export const init = createLeaf({
-  commandName: 'init',
+  name: 'init',
   description: 'Initialize this directory as an alwaysAI application',
-  namedInputs: {
+  options: {
     yes,
   },
-  async action({ yes }) {
+  async action(_, { yes }) {
     const username = checkLoggedIn();
 
     if (existsSync(APP_CONFIG_FILE_NAME)) {

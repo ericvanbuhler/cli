@@ -9,7 +9,7 @@ import { user } from './user';
 import { rpc } from './rpc';
 
 const root = createBranch({
-  commandName: 'alwaysai',
+  name: 'alwaysai',
   description: 'Manage your alwaysAI assets and environment',
   subcommands: [app, user, models, rpc, version],
 });

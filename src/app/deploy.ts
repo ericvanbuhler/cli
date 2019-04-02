@@ -57,12 +57,12 @@ const to: Input<DeploymentTarget, true> = {
 };
 
 export const deploy = createLeaf({
-  commandName: 'deploy',
+  name: 'deploy',
   description: 'Deploy an alwaysAI application to a device',
-  namedInputs: {
+  options: {
     to,
   },
-  async action({ to }) {
+  async action(_, { to }) {
     checkAppConfigFile();
     const { username = 'alwaysai', password, port, hostname, pathname } = to;
     const sshClient = new SshClient({

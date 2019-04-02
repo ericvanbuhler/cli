@@ -1,20 +1,20 @@
 import { createLeaf, createBranch } from '@alwaysai/always-cli';
 import { createRpcClient, CredentialsStore } from '@alwaysai/cloud-api-nodejs';
 
-import { cloudApiUrl } from '../cloud-api-url';
+import { cloudApi } from '../cloud-api';
 import { username } from './username';
 import { password } from './password';
 
 const logIn = createLeaf({
-  commandName: 'logIn',
+  name: 'logIn',
   description: 'Log in to the alwaysAI Cloud',
-  namedInputs: {
+  options: {
     username,
     password,
-    cloudApiUrl,
+    cloudApi,
   },
-  async action({ cloudApiUrl, ...credentials }) {
-    const rpcClient = createRpcClient({ cloudApiUrl, credentials });
+  async action(_, { cloudApi, ...credentials }) {
+    const rpcClient = createRpcClient({ cloudApiUrl: cloudApi, credentials });
     await rpcClient.getNull();
     const store = new CredentialsStore();
     store.write(credentials);
@@ -23,9 +23,9 @@ const logIn = createLeaf({
 });
 
 const logOut = createLeaf({
-  commandName: 'logOut',
+  name: 'logOut',
   description: 'Log out of the alwaysAI Cloud',
-  namedInputs: {},
+  options: {},
   action() {
     const store = new CredentialsStore();
     const credentials = store.read();
@@ -38,9 +38,9 @@ const logOut = createLeaf({
 });
 
 const show = createLeaf({
-  commandName: 'show',
+  name: 'show',
   description: 'Show the currently logged in user',
-  namedInputs: {},
+  options: {},
   action() {
     const store = new CredentialsStore();
     const credentials = store.read();
@@ -52,7 +52,7 @@ const show = createLeaf({
 });
 
 export const user = createBranch({
-  commandName: 'user',
+  name: 'user',
   description: 'Log in or log out of the alwaysAI cloud',
   subcommands: [logIn, logOut, show],
 });

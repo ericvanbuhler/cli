@@ -2,9 +2,10 @@ import { createBranch } from '@alwaysai/always-cli';
 import { addModels } from './add';
 import { pullModels } from './pull';
 import { removeModels } from './remove';
+import { showModels } from './show';
 
 export const models = createBranch({
-  commandName: 'models',
+  name: 'models',
   description: 'Manage models in an alwaysAI App',
-  subcommands: [pullModels, addModels, removeModels],
+  subcommands: [pullModels, showModels, addModels, removeModels],
 });

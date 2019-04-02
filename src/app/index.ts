@@ -5,7 +5,7 @@ import { models } from './models';
 import { deploy } from './deploy';
 
 export const app = createBranch({
-  commandName: 'app',
+  name: 'app',
   description: 'Create or manage an alwaysAI application',
   subcommands: [init, deploy, show, models],
 });
