@@ -64,7 +64,7 @@ export const deploy = createLeaf({
   },
   async action(_, { to }) {
     appConfigFile.read();
-    const { username = 'alwaysai', password, port, hostname, pathname } = to;
+    const { username = 'alwaysai', password = 'alwaysai', port, hostname, pathname } = to;
     const sshClient = new SshClient({
       hostname,
       port,
