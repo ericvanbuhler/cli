@@ -41,38 +41,49 @@ export const init = createLeaf({
     if (yes) {
       appConfigFile.write(defaultConfig);
     } else {
-      const answers = await prompts([
+      let canceled = false;
+      const answers = await prompts(
+        [
+          {
+            type: 'text',
+            name: 'publisher',
+            message: 'publisher',
+            initial: defaultConfig.publisher,
+          },
+          {
+            type: 'text',
+            name: 'name',
+            message: 'name',
+            initial: defaultConfig.name,
+          },
+          {
+            type: 'text',
+            name: 'version',
+            message: 'version',
+            initial: defaultConfig.version,
+          },
+          {
+            type: 'text',
+            name: 'repository',
+            message: 'git repository',
+            initial: defaultConfig.repository,
+          },
+          {
+            type: 'text',
+            name: 'startCommand',
+            message: 'start command',
+            initial: defaultConfig.scripts!.start,
+          },
+        ],
         {
-          type: 'text',
-          name: 'publisher',
-          message: 'publisher',
-          initial: defaultConfig.publisher,
+          onCancel() {
+            canceled = true;
+          },
         },
-        {
-          type: 'text',
-          name: 'name',
-          message: 'name',
-          initial: defaultConfig.name,
-        },
-        {
-          type: 'text',
-          name: 'version',
-          message: 'version',
-          initial: defaultConfig.version,
-        },
-        {
-          type: 'text',
-          name: 'repository',
-          message: 'git repository',
-          initial: defaultConfig.repository,
-        },
-        {
-          type: 'text',
-          name: 'startCommand',
-          message: 'start command',
-          initial: defaultConfig.scripts!.start,
-        },
-      ]);
+      );
+      if (canceled) {
+        return;
+      }
       const { startCommand, name, publisher, repository, version } = answers;
       const scripts: AppConfig['scripts'] = {};
       if (startCommand) {

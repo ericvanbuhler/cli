@@ -21,9 +21,8 @@
       "args": [
         "src/index.ts",
         "app",
-        "deploy",
-        "--to",
-        "ssh://linaro@linaro:alwaysai03/tmp/asdf"
+        "dev",
+        "init"
       ],
     },
   ]

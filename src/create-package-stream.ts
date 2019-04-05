@@ -5,7 +5,7 @@ import difference = require('lodash.difference');
 
 const IGNORE_FILE_NAMES = ['.git', 'node_modules'];
 
-export function createPackageStream(dir: string) {
+export function createPackageStream(dir = process.cwd()) {
   const allFileNames = readdirSync(dir);
   const filteredFileNames = difference(allFileNames, IGNORE_FILE_NAMES);
   const packageStream = (tar.create(

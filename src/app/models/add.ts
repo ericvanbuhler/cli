@@ -19,6 +19,7 @@ export const addModels = createLeaf({
   args: ids,
   async action(ids, { cloudApi }) {
     const credentials = credentialsStore.read();
+    appConfigFile.read();
     const rpcClient = createRpcClient({ credentials, cloudApiUrl: cloudApi });
     for (const id of ids) {
       const { publisher, name } = ModelId.parse(id);
