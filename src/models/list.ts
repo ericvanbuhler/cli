@@ -1,8 +1,9 @@
 import { createLeaf } from '@alwaysai/always-cli';
-import { createRpcClient, CredentialsStore } from '@alwaysai/cloud-api-nodejs';
+import { createRpcClient } from '@alwaysai/cloud-api-nodejs';
 
 import { ModelId } from '../model-id';
 import { cloudApi } from '../cloud-api';
+import { credentialsStore } from '../credentials-store';
 
 export const list = createLeaf({
   name: 'list',
@@ -11,8 +12,7 @@ export const list = createLeaf({
     cloudApi,
   },
   async action(_, { cloudApi }) {
-    const store = new CredentialsStore();
-    const credentials = store.read();
+    const credentials = credentialsStore.read();
     const rpcClient = createRpcClient({ credentials, cloudApiUrl: cloudApi });
     const models = await rpcClient.listModels();
     return models.map(model => ModelId.serialize(model)).join('\n');

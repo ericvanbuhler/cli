@@ -2,9 +2,9 @@ import { URL } from 'url';
 
 import { createLeaf, Input, UsageError } from '@alwaysai/always-cli';
 
-import { checkAppConfigFile } from '../app-config-file';
 import { createPackageStream } from '../create-package-stream';
 import { SshClient } from '../ssh-client';
+import { appConfigFile } from '../app-config-file';
 
 type DeploymentTarget = {
   protocol: string;
@@ -63,7 +63,7 @@ export const deploy = createLeaf({
     to,
   },
   async action(_, { to }) {
-    checkAppConfigFile();
+    appConfigFile.read();
     const { username = 'alwaysai', password, port, hostname, pathname } = to;
     const sshClient = new SshClient({
       hostname,

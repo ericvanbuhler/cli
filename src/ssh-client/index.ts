@@ -48,7 +48,7 @@ export class SshClient {
     const {
       hostname = 'localhost',
       username = 'alwaysai',
-      password = 'alwaysai',
+      password,
       privateKey,
       port = 22,
     } = this.config;
@@ -66,7 +66,7 @@ export class SshClient {
         port,
         privateKey: privateKey || defaultPrivateKey,
         username,
-        password,
+        password: password || 'alwaysai',
       });
     });
   }

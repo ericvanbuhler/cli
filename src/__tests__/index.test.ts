@@ -1,6 +1,6 @@
 import { runAndCatch } from '@alwaysai/always-cli';
 
-import { alwaysai } from '.';
+import { alwaysai } from '..';
 
 describe('index file', () => {
   it('shows usage', async () => {

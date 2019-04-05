@@ -1,8 +1,9 @@
 import { createLeaf, createJsonInput, createBranch } from '@alwaysai/always-cli';
 import { rpcMethodSpecs } from '@alwaysai/cloud-api';
-import { CredentialsStore, createRpcClient } from '@alwaysai/cloud-api-nodejs';
+import { createRpcClient } from '@alwaysai/cloud-api-nodejs';
 
 import { cloudApi } from './cloud-api';
+import { credentialsStore } from './credentials-store';
 
 const subcommands = Object.entries(rpcMethodSpecs).map(
   ([methodName, { description }]) => {
@@ -14,8 +15,7 @@ const subcommands = Object.entries(rpcMethodSpecs).map(
         cloudApi,
       },
       async action(_, { args, cloudApi }) {
-        const store = new CredentialsStore();
-        const credentials = store.read();
+        const credentials = credentialsStore.read();
         const rpcClient = createRpcClient({ cloudApiUrl: cloudApi, credentials });
         const method = (rpcClient as any)[methodName];
         const result = await method(...(args || []));

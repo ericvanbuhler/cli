@@ -1,4 +1,4 @@
-import { existsSync, readFileSync, writeFileSync } from 'fs';
+import { readFileSync, writeFileSync } from 'fs';
 import { basename, join } from 'path';
 
 import origin = require('remote-origin-url');
@@ -6,12 +6,14 @@ import prompts = require('prompts');
 
 import { createLeaf, TerseError } from '@alwaysai/always-cli';
 import { yes } from './yes';
-import { writeAppConfigFile, APP_CONFIG_FILE_NAME, AppConfig } from '../app-config-file';
-import { checkLoggedIn } from '../check-logged-in';
+import { appConfigFile } from '../app-config-file';
+import { credentialsStore } from '../credentials-store';
 
 const APP_PY = readFileSync(join(__dirname, '..', '..', 'assets', 'app.py'), {
   encoding: 'utf8',
 });
+
+type AppConfig = Parameters<typeof appConfigFile.write>[0];
 
 export const init = createLeaf({
   name: 'init',
@@ -20,11 +22,10 @@ export const init = createLeaf({
     yes,
   },
   async action(_, { yes }) {
-    const username = checkLoggedIn();
-
-    if (existsSync(APP_CONFIG_FILE_NAME)) {
+    if (appConfigFile.exists()) {
       throw new TerseError("You're already in an alwaysAI app directory!");
     }
+    const { username } = credentialsStore.read();
 
     const defaultConfig: AppConfig = {
       publisher: username,
@@ -38,7 +39,7 @@ export const init = createLeaf({
     };
 
     if (yes) {
-      writeAppConfigFile(APP_CONFIG_FILE_NAME, defaultConfig);
+      appConfigFile.write(defaultConfig);
     } else {
       const answers = await prompts([
         {
@@ -77,7 +78,7 @@ export const init = createLeaf({
       if (startCommand) {
         scripts.start = startCommand;
       }
-      writeAppConfigFile(APP_CONFIG_FILE_NAME, {
+      appConfigFile.write({
         publisher,
         name,
         version,
@@ -86,7 +87,7 @@ export const init = createLeaf({
         repository,
       });
     }
-    console.log(`Wrote ${APP_CONFIG_FILE_NAME}`);
+    console.log(`Wrote ${basename(appConfigFile.path)}`);
     try {
       writeFileSync('app.py', APP_PY, { flag: 'wx' });
       console.log('Wrote app.py');
