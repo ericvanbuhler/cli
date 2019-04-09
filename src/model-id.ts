@@ -7,12 +7,12 @@ export type ModelId = {
 
 export const ModelId = {
   parse(modelId: string) {
-    const splits = modelId.split('/');
     const errorMessage = `Expected model ID to be of the form "@publisher/modelName"`;
-    if (splits.length !== 2) {
+    if (modelId.charAt(0) !== '@') {
       throw new TerseError(errorMessage);
     }
-    if (splits[0].charAt(0) !== '@') {
+    const splits = modelId.split('/');
+    if (splits.length !== 2) {
       throw new TerseError(errorMessage);
     }
     return {

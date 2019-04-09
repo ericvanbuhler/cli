@@ -12,7 +12,7 @@ export type SandboxUrl = {
 export const SandboxUrl = {
   parse(serialized: string) {
     if (!serialized.startsWith('ssh://')) {
-      throw new Error('Expected url to start with "ssh://"');
+      throw new Error('Expected sandbox URL to start with "ssh://"');
     }
     let url: URL;
     try {
@@ -21,6 +21,11 @@ export const SandboxUrl = {
       throw new Error(`Failed to parse value as URL`);
     }
     const { hostname, port, username, password, pathname } = url;
+
+    if (!pathname || pathname === '/') {
+      throw new Error('Expected sandbox URL to end with a filesystem directory path');
+    }
+
     const sandboxUrl: SandboxUrl = {
       protocol: 'ssh:',
       hostname,

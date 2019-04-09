@@ -19,7 +19,7 @@ const ENOENT = {
   code: 'TERSE',
 };
 
-function AppConfigFile(dir = process.cwd()) {
+export function AppConfigFile(dir = process.cwd()) {
   const path = join(dir, APP_CONFIG_FILE_NAME);
   const configFile = ConfigFile({ path, codec, ENOENT });
   return {

@@ -23,7 +23,7 @@
     "postversion": "npm publish"
   },
   "dependencies": {
-    "@alwaysai/always-cli": "0.0.0-8",
+    "@alwaysai/always-cli": "0.0.0-9",
     "@alwaysai/cloud-api": "0.0.0-6",
     "@alwaysai/cloud-api-nodejs": "0.0.0-6",
     "@alwaysai/codecs": "0.0.0-2",

@@ -2,7 +2,7 @@ import { URL } from 'url';
 
 import { createLeaf, Input, UsageError } from '@alwaysai/always-cli';
 
-import { createPackageStream } from '../create-package-stream';
+import { createTarbombStream } from '../create-tarbomb-stream';
 import { SshClient } from '../ssh-client';
 import { appConfigFile } from '../app-config-file';
 
@@ -72,7 +72,7 @@ export const deploy = createLeaf({
       password,
     });
     await sshClient.connect();
-    const packageStream = createPackageStream(process.cwd());
+    const packageStream = createTarbombStream(process.cwd());
     return await sshClient.unPackage(pathname, packageStream);
   },
 });
