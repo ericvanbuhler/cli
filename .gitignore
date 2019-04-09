@@ -4,6 +4,7 @@
 alwaysai.*.json
 
 /coverage
+/app.py
 
 # Logs
 logs
