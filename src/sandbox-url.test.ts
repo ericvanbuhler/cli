@@ -2,11 +2,12 @@ import { SandboxUrl } from './sandbox-url';
 
 const { parse, serialize } = SandboxUrl;
 
-const parseData: ([string, ReturnType<typeof parse>])[] = [
+const data: ([string, ReturnType<typeof parse>])[] = [
   [
     'ssh://localhost:23/foo',
     { protocol: 'ssh:', port: 23, hostname: 'localhost', pathname: '/foo' },
   ],
+  ['ssh://:::23/foo', { protocol: 'ssh:', hostname: '[:::23]', pathname: '/foo' }],
   [
     'ssh://user@h/foo',
     { protocol: 'ssh:', username: 'user', hostname: 'h', pathname: '/foo' },
@@ -24,9 +25,17 @@ const parseData: ([string, ReturnType<typeof parse>])[] = [
 ];
 
 describe('SandboxUrl', () => {
-  for (const [serialized, sandboxUrl] of parseData) {
+  for (const [serialized, sandboxUrl] of data) {
     it(`parses "${serialized}"`, () => {
       expect(parse(serialized)).toEqual(sandboxUrl);
+    });
+
+    it('idempotency check', () => {
+      const serializedAgain = serialize(parse(serialized));
+      // This ^^ value may differ from the original "serialized",
+      // but if we re-parse and serialize the serializedAgain
+      // we would expect to get the same thing back again (idempotency)
+      expect(serialize(parse(serializedAgain))).toBe(serializedAgain);
     });
   }
 
@@ -35,16 +44,7 @@ describe('SandboxUrl', () => {
     expect(() => parse('ssh://foo')).toThrow(/to end with/i);
   });
 
-  it('throws "ssh:" if the protocol is not "ssh:"', () => {
+  it('throws "to start with" if the protocol is not "ssh:"', () => {
     expect(() => parse('sh://foo')).toThrow(/to start with/i);
-  });
-
-  it('throws "failed to parse value as URL" if the URL is bad', () => {
-    expect(() => parse('ssh://foo::::')).toThrow(/failed to parse value as URL/i);
-  });
-
-  it('consistency checks', () => {
-    const serialized = 'ssh://user:@h:/foo';
-    expect(serialize(parse(serialized))).toBe(serialized);
   });
 });

@@ -22,8 +22,9 @@
       "args": [
         "src/index.ts",
         "app",
-        "dev",
-        "init"
+        "deploy",
+        "--to",
+        "ssh://174.79.247.180:1024/foo"
       ],
     },
   ]
