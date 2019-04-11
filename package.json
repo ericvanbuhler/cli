@@ -24,7 +24,7 @@
   },
   "dependencies": {
     "@alwaysai/always-cli": "0.0.0-9",
-    "@alwaysai/cloud-api": "0.0.0-6",
+    "@alwaysai/cloud-api": "0.0.0-7",
     "@alwaysai/cloud-api-nodejs": "0.0.0-6",
     "@alwaysai/codecs": "0.0.0-2",
     "@alwaysai/config-nodejs": "0.0.0-2",
