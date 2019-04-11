@@ -54,8 +54,10 @@ function parse(serialized: string) {
 
   // Example: afterAt = [1.2.3.4]:5678/foo/bar;
   const [beforeSlash, afterSlash] = splitString(afterAt, '/');
-  if (!beforeSlash || afterSlash.length === 0) {
-    throw new Error('Expected URL to end with a filesystem directory ".../some/path"');
+  if (typeof beforeSlash === 'undefined' || afterSlash.length === 0) {
+    throw new Error(
+      'Expected URL to end with a filesystem directory "ssh://.../some/path"',
+    );
   }
   partial.pathname = `/${afterSlash}`;
   const { hostname, port } = parseHost(beforeSlash);
@@ -64,7 +66,7 @@ function parse(serialized: string) {
   const sandboxUrl: SandboxUrl = {
     ...partial,
     protocol: 'ssh:',
-    hostname: isIpv6 ? `[${hostname}]` : hostname,
+    hostname: isIpv6 ? `[${hostname}]` : hostname || undefined,
     port,
     pathname: partial.pathname,
   };
