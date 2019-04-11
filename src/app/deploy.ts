@@ -1,19 +1,9 @@
-import { URL } from 'url';
-
-import { createLeaf, Input, UsageError } from '@alwaysai/always-cli';
+import { createLeaf, Input, UsageError, USAGE } from '@alwaysai/always-cli';
 
 import { createTarbombStream } from '../create-tarbomb-stream';
 import { SshClient } from '../ssh-client';
 import { appConfigFile } from '../app-config-file';
-
-type DeploymentTarget = {
-  protocol: string;
-  hostname: string;
-  pathname: string;
-  port?: number;
-  username?: string;
-  password?: string;
-};
+import { SandboxUrl } from '../sandbox-url';
 
 const example = 'ssh://user:pass@1.2.3.4/some/path';
 const placeholder = '<url>';
@@ -21,7 +11,7 @@ const description = `
   WHATWG URL of the deployment target, e.g.
    "${example}"`;
 
-const to: Input<DeploymentTarget, true> = {
+const to: Input<SandboxUrl, true> = {
   placeholder,
   required: true,
   getDescription() {
@@ -31,28 +21,13 @@ const to: Input<DeploymentTarget, true> = {
     if (!argv[0]) {
       throw new UsageError(`Expected a ${placeholder}`);
     }
-    const arg0 = argv[0];
-    let url: URL;
     try {
-      url = new URL(arg0);
+      return SandboxUrl.parse(argv[0]);
     } catch (ex) {
-      throw new UsageError(`Failed to parse value as URL`);
+      ex.code = USAGE;
+      ex.message = ex.message || 'Failed to parse as sandbox URL';
+      throw ex;
     }
-    const { protocol, hostname, port, username, password, pathname } = url;
-    if (protocol !== 'ssh:') {
-      throw new UsageError(`Protocol of the URL must be "ssh:"`);
-    }
-    if (!pathname || pathname === '/') {
-      throw new UsageError(`URL must include a filesystem path`);
-    }
-    return {
-      protocol,
-      hostname,
-      port: port ? Number(port) : undefined,
-      username: username || undefined,
-      password: password || undefined,
-      pathname,
-    };
   },
 };
 
