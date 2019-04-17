@@ -20,11 +20,7 @@
       "name": "CLI",
       "program": "${workspaceFolder}/node_modules/.bin/ts-node",
       "args": [
-        "src/index.ts",
-        "app",
-        "deploy",
-        "--to",
-        "ssh://174.79.247.180:1024/foo"
+        "src/index.ts"
       ],
     },
   ]

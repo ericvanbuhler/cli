@@ -1,14 +1,13 @@
 import { NOT_FOUND } from 'http-status-codes';
 
 import { createLeaf, TerseError } from '@alwaysai/always-cli';
-import { createRpcClient } from '@alwaysai/cloud-api-nodejs';
 
-import { cloudApi } from '../../cloud-api';
-import { appConfigFile } from '../../app-config-file';
-import { ModelId } from '../../model-id';
+import { cloudApi } from '../../../cloud-api';
+import { appConfigFile } from '../../../app-config-file';
+import { ModelId } from '../../../model-id';
 import { ids } from './ids';
-import { fakeSpinner } from '../../fake-spinner';
-import { credentialsStore } from '../../credentials-store';
+import { fakeSpinner } from '../../../fake-spinner';
+import { createRpcClient } from '../../../create-rpc-client';
 
 export const addModels = createLeaf({
   name: 'add',
@@ -17,10 +16,9 @@ export const addModels = createLeaf({
     cloudApi,
   },
   args: ids,
-  async action(ids, { cloudApi }) {
-    const credentials = credentialsStore.read();
+  async action(ids) {
     appConfigFile.read();
-    const rpcClient = createRpcClient({ credentials, cloudApiUrl: cloudApi });
+    const rpcClient = createRpcClient();
     for (const id of ids) {
       const { publisher, name } = ModelId.parse(id);
       try {

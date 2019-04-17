@@ -6,10 +6,10 @@ import prompts = require('prompts');
 
 import { createLeaf, TerseError } from '@alwaysai/always-cli';
 import { yes } from './yes';
-import { appConfigFile } from '../app-config-file';
-import { credentialsStore } from '../credentials-store';
+import { appConfigFile } from '../../app-config-file';
+import { credentialsStore } from '../../credentials-store';
 
-const APP_PY = readFileSync(join(__dirname, '..', '..', 'assets', 'app.py'), {
+const APP_PY = readFileSync(join(__dirname, '..', '..', '..', 'assets', 'app.py'), {
   encoding: 'utf8',
 });
 
@@ -25,10 +25,9 @@ export const init = createLeaf({
     if (appConfigFile.exists()) {
       throw new TerseError("You're already in an alwaysAI app directory!");
     }
-    const { username } = credentialsStore.read();
+    credentialsStore.read();
 
     const defaultConfig: AppConfig = {
-      publisher: username,
       name: basename(process.cwd()),
       version: '0.0.0-0',
       models: {},

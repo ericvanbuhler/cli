@@ -1,5 +1,5 @@
 import { createLeaf } from '@alwaysai/always-cli';
-import { appConfigFile } from '../app-config-file';
+import { appConfigFile } from '../../app-config-file';
 
 export const show = createLeaf({
   name: 'show',

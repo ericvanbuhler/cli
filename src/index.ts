@@ -1,17 +1,13 @@
 #!/usr/bin/env node
 
 import { createBranch, createCli, runAndExit } from '@alwaysai/always-cli';
-
-import { app } from './app';
-import { version } from './version';
-import { models } from './models';
-import { user } from './user';
-import { rpc } from './rpc';
+import { subcommands } from './subcommands';
+import { CLI_NAME } from './constants';
 
 const root = createBranch({
-  name: 'alwaysai',
+  name: CLI_NAME,
   description: 'Manage your alwaysAI assets and environment',
-  subcommands: [app, user, models, rpc, version],
+  subcommands,
 });
 
 export const alwaysai = createCli(root);

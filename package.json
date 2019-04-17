@@ -3,6 +3,10 @@
   "description": "The alwaysAI command-line interface (CLI)",
   "version": "0.0.0-12",
   "main": "lib/index.js",
+  "publishConfig": {
+    "access": "public",
+    "tag": "next"
+  },
   "types": "lib/index.d.ts",
   "bin": {
     "alwaysai": "lib/index.js"
@@ -23,11 +27,10 @@
     "postversion": "npm publish"
   },
   "dependencies": {
-    "@alwaysai/always-cli": "0.0.0-9",
-    "@alwaysai/cloud-api": "0.0.0-7",
-    "@alwaysai/cloud-api-nodejs": "0.0.0-6",
-    "@alwaysai/codecs": "0.0.0-2",
-    "@alwaysai/config-nodejs": "0.0.0-2",
+    "@alwaysai/cloud-api": "0.0.0-10",
+    "@alwaysai/cloud-api-nodejs": "0.0.0-8",
+    "@alwaysai/codecs": "0.0.0-5",
+    "@alwaysai/config-nodejs": "0.0.0-4",
     "@carnesen/coded-error": "0.1.0",
     "@types/lodash.difference": "4.5.6",
     "@types/mkdirp": "0.5.2",
@@ -35,6 +38,8 @@
     "@types/remote-origin-url": "2.0.0",
     "@types/ssh2": "0.5.38",
     "@types/tar": "4.0.0",
+    "chalk": "2.4.2",
+    "firebase": "5.9.4",
     "http-status-codes": "1.3.2",
     "lodash.difference": "4.5.0",
     "mkdirp": "0.5.1",
@@ -45,7 +50,7 @@
     "tar": "4.4.8"
   },
   "devDependencies": {
-    "@alwaysai/build-cli": "0.0.0-1",
+    "@alwaysai/build-cli": "0.0.0-2",
     "@alwaysai/tsconfig": "0.0.0",
     "@alwaysai/tslint-config": "0.0.3",
     "@types/jest": "24.0.11",
@@ -53,10 +58,10 @@
     "@types/tempy": "0.2.0",
     "jest": "24.7.1",
     "rimraf": "2.6.3",
-    "tempy": "0.2.1",
+    "tempy": "0.3.0",
     "ts-jest": "24.0.2",
-    "ts-node": "8.0.3",
-    "tslint": "5.15.0",
+    "ts-node": "8.1.0",
+    "tslint": "5.16.0",
     "typescript": "3.4.3"
   },
   "files": [

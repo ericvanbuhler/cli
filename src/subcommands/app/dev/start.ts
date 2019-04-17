@@ -1,8 +1,8 @@
 import { createLeaf, TerseError } from '@alwaysai/always-cli';
 import { devConfigFile } from './dev-config-file';
-import { SandboxUrl } from '../../sandbox-url';
-import { SshClient } from '../../ssh-client';
-import { appConfigFile } from '../../app-config-file';
+import { SandboxUrl } from '../../../sandbox-url';
+import { SshClient } from '../../../ssh-client';
+import { appConfigFile } from '../../../app-config-file';
 
 export const start = createLeaf({
   name: 'start',

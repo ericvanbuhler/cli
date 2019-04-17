@@ -1,6 +1,6 @@
 import { createLeaf } from '@alwaysai/always-cli';
-import { appConfigFile } from '../../app-config-file';
-import { fakeSpinner } from '../../fake-spinner';
+import { appConfigFile } from '../../../app-config-file';
+import { fakeSpinner } from '../../../fake-spinner';
 import { ids } from './ids';
 
 export const removeModels = createLeaf({

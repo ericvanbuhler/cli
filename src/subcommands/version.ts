@@ -1,5 +1,5 @@
 import { createLeaf } from '@alwaysai/always-cli';
-const pkg = require('../package.json');
+const pkg = require('../../package.json');
 
 export const version = createLeaf({
   name: 'version',

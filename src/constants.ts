@@ -1,1 +1,1 @@
-export const COMMAND_NAME = 'alwaysai';
+export const CLI_NAME = 'alwaysai';

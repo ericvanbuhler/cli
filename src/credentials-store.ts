@@ -1,10 +1,11 @@
 import { join } from 'path';
 
 import { ALWAYSAI_CONFIG_DIR, ConfigFile } from '@alwaysai/config-nodejs';
-import * as t from '@alwaysai/codecs';
+import * as t from 'io-ts';
 
 const codec = t.type({
-  username: t.string,
+  email: t.string,
+  idToken: t.string,
   password: t.string,
 });
 
@@ -13,7 +14,7 @@ const ENOENT = {
   code: 'TERSE',
 };
 
-const path = join(ALWAYSAI_CONFIG_DIR, 'credentials.json');
+const path = join(ALWAYSAI_CONFIG_DIR, 'alwaysai.credentials.json');
 
 export const credentialsStore = ConfigFile({
   path,

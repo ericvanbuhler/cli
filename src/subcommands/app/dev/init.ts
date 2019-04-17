@@ -2,8 +2,8 @@ import prompts = require('prompts');
 
 import { createLeaf } from '@alwaysai/always-cli';
 import { devConfigFile } from './dev-config-file';
-import { credentialsStore } from '../../credentials-store';
-import { SandboxUrl } from '../../sandbox-url';
+import { credentialsStore } from '../../../credentials-store';
+import { SandboxUrl } from '../../../sandbox-url';
 import { isAbsolute, basename } from 'path';
 
 export const init = createLeaf({

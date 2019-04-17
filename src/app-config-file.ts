@@ -1,6 +1,6 @@
 import { join } from 'path';
 
-import * as t from '@alwaysai/codecs';
+import * as t from 'io-ts';
 import { ConfigFile } from '@alwaysai/config-nodejs';
 
 export const APP_CONFIG_FILE_NAME = 'alwaysai.app.json';

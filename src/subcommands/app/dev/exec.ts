@@ -1,7 +1,7 @@
 import { createLeaf, createStringArrayInput } from '@alwaysai/always-cli';
 import { devConfigFile } from './dev-config-file';
-import { SandboxUrl } from '../../sandbox-url';
-import { SshClient } from '../../ssh-client';
+import { SandboxUrl } from '../../../sandbox-url';
+import { SshClient } from '../../../ssh-client';
 
 export const exec = createLeaf({
   name: 'exec',
