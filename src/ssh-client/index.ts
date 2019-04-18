@@ -6,7 +6,12 @@ import { readFile } from 'fs';
 import { promisify } from 'util';
 import { join } from 'path';
 import { homedir, userInfo } from 'os';
-import { TerseError } from '@alwaysai/always-cli';
+import { checkTerminalIsInteractive } from '../prompt';
+
+export const DEFAULT_USERNAME = userInfo().username;
+export const DEFAULT_PORT = 22;
+
+const REMOTE_COMMAND_FAILED = 'REMOTE_COMMAND_FAILED';
 
 type Config = Partial<{
   hostname: string;
@@ -46,7 +51,7 @@ export class SshClient {
   }
 
   public async connect() {
-    const { hostname, username, password, privateKey, port = 22 } = this.config;
+    const { hostname, username, password, privateKey, port = DEFAULT_PORT } = this.config;
     let defaultPrivateKey: string | undefined;
     if (!privateKey && !password) {
       defaultPrivateKey = await readDefaultPrivateKey();
@@ -60,17 +65,16 @@ export class SshClient {
         host: hostname,
         port,
         privateKey: privateKey || defaultPrivateKey,
-        username: username || userInfo().username,
+        username: username || DEFAULT_USERNAME,
         password,
       });
     });
   }
 
   public async shell(opts: { cwd?: string } = {}) {
-    if (!process.stdout.isTTY) {
-      throw new TerseError('Node.js is not currently being run in a text terminal "TTY"');
-    }
     return new Promise<ClientChannel>((resolve, reject) => {
+      checkTerminalIsInteractive();
+      process.stdin.setRawMode!(true);
       const ready = this.ssh2.shell({ term: 'xterm-256color' }, (err, channel) => {
         if (!ready) {
           return reject(new Error(`SSH server is not ready`));
@@ -113,7 +117,7 @@ export class SshClient {
         channel.on('close', (code: any) => {
           if (code !== 0) {
             const message = `Remote command "${command}" exited with code ${code}`;
-            throw new CodedError(message, code, resolvedValue);
+            reject(new CodedError(message, REMOTE_COMMAND_FAILED, resolvedValue));
           }
           resolvedValue.code = code;
           resolve(resolvedValue as ExecResult);
@@ -156,13 +160,17 @@ export class SshClient {
     try {
       await this.runCommand(`mkdir -p "${path}"`);
     } catch (ex) {
-      // TODO: Better error
+      if (ex && ex.code === REMOTE_COMMAND_FAILED && ex.data) {
+        const { stderr } = ex.data;
+        if (stderr && typeof stderr === 'string') {
+          throw new Error(stderr);
+        }
+      }
       throw ex;
     }
   }
 
   public async unPackage(destination: string, packageStream: Readable) {
-    await this.mkdirp(destination);
     await this.runCommand(`cd ${destination} && tar xvfz -`, packageStream);
   }
 }

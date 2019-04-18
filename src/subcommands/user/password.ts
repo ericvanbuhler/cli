@@ -1,14 +1,16 @@
 import { UsageError, Input, TerseError } from '@alwaysai/always-cli';
-import { prompt } from './prompt';
+import { prompt } from '../../prompt';
 
 const placeholder = '<password>';
 
 export async function promptForPassword() {
-  const response = await prompt({
-    type: 'password',
-    name: 'password',
-    message: 'Password',
-  });
+  const response = await prompt([
+    {
+      type: 'password',
+      name: 'password',
+      message: 'Password',
+    },
+  ]);
   if (!response) {
     throw new TerseError('Value "password" is required');
   }

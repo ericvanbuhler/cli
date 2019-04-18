@@ -6,7 +6,6 @@ import { ConfigFile } from '@alwaysai/config-nodejs';
 export const APP_CONFIG_FILE_NAME = 'alwaysai.app.json';
 
 const codec = t.partial({
-  publisher: t.string,
   name: t.string,
   version: t.string,
   models: t.record(t.string, t.string, 'models'),

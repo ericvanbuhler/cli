@@ -1,13 +1,12 @@
 import { readFileSync, writeFileSync } from 'fs';
 import { basename, join } from 'path';
-
 import origin = require('remote-origin-url');
-import prompts = require('prompts');
 
 import { createLeaf, TerseError } from '@alwaysai/always-cli';
+
 import { yes } from './yes';
 import { appConfigFile } from '../../app-config-file';
-import { credentialsStore } from '../../credentials-store';
+import { prompt, checkTerminalIsInteractive } from '../../prompt';
 
 const APP_PY = readFileSync(join(__dirname, '..', '..', '..', 'assets', 'app.py'), {
   encoding: 'utf8',
@@ -22,14 +21,22 @@ export const init = createLeaf({
     yes,
   },
   async action(_, { yes }) {
-    if (appConfigFile.exists()) {
-      throw new TerseError("You're already in an alwaysAI app directory!");
+    if (!yes) {
+      checkTerminalIsInteractive();
     }
-    credentialsStore.read();
+
+    if (appConfigFile.exists()) {
+      throw new TerseError("You're already in an alwaysAI application directory!");
+    }
+
+    console.log(
+      'Welcome! This command will initialize this directory as an alwaysAI application.',
+    );
+    console.log();
 
     const defaultConfig: AppConfig = {
       name: basename(process.cwd()),
-      version: '0.0.0-0',
+      version: '0.0.0',
       models: {},
       scripts: {
         start: 'python app.py',
@@ -40,61 +47,36 @@ export const init = createLeaf({
     if (yes) {
       appConfigFile.write(defaultConfig);
     } else {
-      let canceled = false;
-      const answers = await prompts(
-        [
-          {
-            type: 'text',
-            name: 'publisher',
-            message: 'publisher',
-            initial: defaultConfig.publisher,
-          },
-          {
-            type: 'text',
-            name: 'name',
-            message: 'name',
-            initial: defaultConfig.name,
-          },
-          {
-            type: 'text',
-            name: 'version',
-            message: 'version',
-            initial: defaultConfig.version,
-          },
-          {
-            type: 'text',
-            name: 'repository',
-            message: 'git repository',
-            initial: defaultConfig.repository,
-          },
-          {
-            type: 'text',
-            name: 'startCommand',
-            message: 'start command',
-            initial: defaultConfig.scripts!.start,
-          },
-        ],
+      const answers = await prompt([
         {
-          onCancel() {
-            canceled = true;
-          },
+          type: 'text',
+          name: 'name',
+          message: 'Application name',
+          initial: defaultConfig.name,
         },
-      );
-      if (canceled) {
-        return;
-      }
-      const { startCommand, name, publisher, repository, version } = answers;
+        {
+          type: 'text',
+          name: 'version',
+          message: 'Application version',
+          initial: defaultConfig.version,
+        },
+        {
+          type: 'text',
+          name: 'startCommand',
+          message: 'Command for starting the application',
+          initial: defaultConfig.scripts!.start,
+        },
+      ]);
+      const { startCommand, name, version } = answers;
       const scripts: AppConfig['scripts'] = {};
       if (startCommand) {
         scripts.start = startCommand;
       }
       appConfigFile.write({
-        publisher,
         name,
         version,
         scripts,
         models: {},
-        repository,
       });
     }
     console.log(`Wrote ${basename(appConfigFile.path)}`);

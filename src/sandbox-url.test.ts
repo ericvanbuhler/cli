@@ -3,7 +3,7 @@ import { SandboxUrl } from './sandbox-url';
 const { parse, serialize } = SandboxUrl;
 
 const data: ([string, ReturnType<typeof parse>])[] = [
-  ['ssh:///foo', { protocol: 'ssh:', pathname: '/foo' }],
+  ['ssh://1/foo', { protocol: 'ssh:', hostname: '1', pathname: '/foo' }],
   [
     'ssh://localhost:23/foo',
     { protocol: 'ssh:', port: 23, hostname: 'localhost', pathname: '/foo' },

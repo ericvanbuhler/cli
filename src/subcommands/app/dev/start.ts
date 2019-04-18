@@ -18,8 +18,6 @@ export const start = createLeaf({
     const sandboxUrl = SandboxUrl.parse(devConfig.sandboxUrl);
     const sshClient = new SshClient(sandboxUrl);
     await sshClient.connect();
-    await sshClient.runCommand2(
-      `cd "${sandboxUrl.pathname}" && DISPLAY=:1 xterm -e ${script}`,
-    );
+    await sshClient.runCommand2(`cd "${sandboxUrl.pathname}" && DISPLAY=:1 ${script}`);
   },
 });

@@ -1,5 +1,6 @@
 import { createLeaf } from '@alwaysai/always-cli';
 import { devConfigFile } from './dev-config-file';
+import { SandboxUrl } from '../../../sandbox-url';
 
 export const show = createLeaf({
   name: 'show',
@@ -7,6 +8,6 @@ export const show = createLeaf({
   options: {},
   async action() {
     const devConfig = devConfigFile.read();
-    return devConfig;
+    return SandboxUrl.parse(devConfig.sandboxUrl);
   },
 });

@@ -5,6 +5,7 @@ import { createTarbombStream } from '../../../create-tarbomb-stream';
 import { SshClient } from '../../../ssh-client';
 import { appConfigFile } from '../../../app-config-file';
 import { devConfigFile } from './dev-config-file';
+import { spinOnPromise } from '../../../spin-on-promise';
 
 export const deploy = createLeaf({
   name: 'deploy',
@@ -17,6 +18,10 @@ export const deploy = createLeaf({
     const sshClient = new SshClient(sandboxUrl);
     await sshClient.connect();
     const packageStream = createTarbombStream(process.cwd());
-    return await sshClient.unPackage(sandboxUrl.pathname, packageStream);
+    await spinOnPromise(sshClient.mkdirp(sandboxUrl.pathname), 'Create directory');
+    await spinOnPromise(
+      sshClient.unPackage(sandboxUrl.pathname, packageStream),
+      'Copy files',
+    );
   },
 });

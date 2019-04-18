@@ -2,7 +2,7 @@ import { parseHost } from './parse-host';
 
 export type SandboxUrl = {
   protocol: 'ssh:';
-  hostname?: string;
+  hostname: string;
   pathname: string;
   port?: number;
   username?: string;
@@ -59,16 +59,25 @@ function parse(serialized: string) {
       'Expected URL to end with a filesystem directory "ssh://.../some/path"',
     );
   }
-  partial.pathname = `/${afterSlash}`;
+
   const { hostname, port } = parseHost(beforeSlash);
+
+  if (!hostname) {
+    throw new Error(
+      `Expected URL to include a hostname or IP address "ssh://example.com/...`,
+    );
+  }
   const isIpv6 = hostname.split(':').length > 2;
 
+  if (port) {
+    partial.port = port;
+  }
+
   const sandboxUrl: SandboxUrl = {
-    ...partial,
     protocol: 'ssh:',
-    hostname: isIpv6 ? `[${hostname}]` : hostname || undefined,
-    port,
-    pathname: partial.pathname,
+    hostname: isIpv6 ? `[${hostname}]` : hostname,
+    ...partial,
+    pathname: `/${afterSlash}`,
   };
   return sandboxUrl;
 }
@@ -91,7 +100,7 @@ function serialize(sandboxUrl: SandboxUrl) {
   if (hostname) {
     serialized += hostname;
   }
-  if (typeof port !== 'undefined') {
+  if (port) {
     serialized += `:${port}`;
   }
   serialized += pathname;

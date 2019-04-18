@@ -8,8 +8,6 @@ import { exec } from './exec';
 
 export const dev = createBranch({
   name: 'dev',
-  description: 'alwaysAI app developer tools',
-  hidden: true,
+  description: 'Tools for developing an alwaysAI application',
   subcommands: [init, show, shell, exec, deploy, start],
 });
-// v4l2-ctl --list-devices

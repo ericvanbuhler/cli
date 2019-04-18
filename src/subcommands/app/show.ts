@@ -6,14 +6,7 @@ export const show = createLeaf({
   description: "Show this directory's alwaysAI application configuration",
   options: {},
   action() {
-    try {
-      const config = appConfigFile.read();
-      return config;
-    } catch (ex) {
-      if (ex.code === 'ENOENT') {
-        throw 'The current directory is not an alwaysAI application';
-      }
-      throw ex;
-    }
+    const config = appConfigFile.read();
+    return config;
   },
 });
