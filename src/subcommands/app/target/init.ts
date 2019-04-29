@@ -78,6 +78,22 @@ export function mergeConfigs(
   return mergedConfig;
 }
 
+const path = createStringInput({
+  description: 'Absolute path for the application on the target system',
+});
+const originalGetValue = path.getValue;
+path.getValue = async argv => {
+  const path = await originalGetValue(argv);
+  if (typeof path === 'undefined') {
+    return path;
+  }
+  const errorMessage = validatePath(path);
+  if (errorMessage) {
+    throw new UsageError(errorMessage);
+  }
+  return path;
+};
+
 const options = {
   yes,
   hostname: createStringInput({
@@ -95,9 +111,7 @@ const options = {
   privateKeyPath: createStringInput({
     description: 'Filesystem path to an SSH private key (if necessary)',
   }),
-  path: createStringInput({
-    description: 'Filesystem path for the application on the target system',
-  }),
+  path,
 };
 
 export const init = createLeaf({
