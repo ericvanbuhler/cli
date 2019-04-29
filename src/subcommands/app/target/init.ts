@@ -49,7 +49,6 @@ async function confirmSave(errorMessage: string, yes: boolean) {
   }
 }
 
-// Options with value undefined are copied into the merged config
 type AnyConfig = { [name: string]: any };
 export function mergeConfigs(
   config0: AnyConfig,
@@ -63,6 +62,7 @@ export function mergeConfigs(
   for (const name of uniqueNames) {
     const value0 = config0[name];
     const value1 = config1[name];
+    // Drop explicit `undefined`s
     if (typeof value1 !== 'undefined') {
       mergedConfig[name] = value1;
       continue;
@@ -71,7 +71,6 @@ export function mergeConfigs(
       mergedConfig[name] = value0;
       continue;
     }
-    // Drop explicit `undefined`s
   }
   if (configs.length > 0) {
     return mergeConfigs(mergedConfig, configs[0], ...configs.slice(1));
