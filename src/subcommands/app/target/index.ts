@@ -6,8 +6,8 @@ import { show } from './show';
 import { deploy } from './deploy';
 import { exec } from './exec';
 
-export const dev = createBranch({
-  name: 'dev',
-  description: 'Tools for developing an alwaysAI application',
+export const target = createBranch({
+  name: 'target',
+  description: 'Tools for developing with a remote target',
   subcommands: [init, show, shell, exec, deploy, start],
 });

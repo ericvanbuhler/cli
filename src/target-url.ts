@@ -1,15 +1,15 @@
 import { parseHost } from './parse-host';
 
-export type SandboxUrl = {
+export type TargetUrl = {
   protocol: 'ssh:';
   hostname: string;
-  pathname: string;
+  path: string;
   port?: number;
   username?: string;
   password?: string;
 };
 
-export const SandboxUrl = {
+export const TargetUrl = {
   parse,
   serialize,
 };
@@ -32,9 +32,9 @@ function parse(serialized: string) {
   // Example: serialized = "ssh://user:pass@[1.2.3.4]:5678/foo/bar"
   const [beforeProtocol, afterProtocol] = splitString(serialized, SSH_COLON_SLASH_SLASH);
   if (beforeProtocol !== '') {
-    throw new Error(`Expected sandbox URL to start with "${SSH_COLON_SLASH_SLASH}"`);
+    throw new Error(`Expected target URL to start with "${SSH_COLON_SLASH_SLASH}"`);
   }
-  const partial: Partial<SandboxUrl> = {
+  const partial: Partial<TargetUrl> = {
     protocol: 'ssh:',
   };
 
@@ -73,17 +73,17 @@ function parse(serialized: string) {
     partial.port = port;
   }
 
-  const sandboxUrl: SandboxUrl = {
+  const targetUrl: TargetUrl = {
     protocol: 'ssh:',
     hostname: isIpv6 ? `[${hostname}]` : hostname,
     ...partial,
-    pathname: `/${afterSlash}`,
+    path: `/${afterSlash}`,
   };
-  return sandboxUrl;
+  return targetUrl;
 }
 
-function serialize(sandboxUrl: SandboxUrl) {
-  const { protocol, hostname, port, username, password, pathname } = sandboxUrl;
+function serialize(targetUrl: TargetUrl) {
+  const { protocol, hostname, port, username, password, path: pathname } = targetUrl;
   let serialized = `${protocol}//`;
   let shouldWriteAt = false;
   if (username) {

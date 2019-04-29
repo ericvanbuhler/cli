@@ -3,10 +3,10 @@ import { init } from './init';
 import { show } from './show';
 import { models } from './models';
 import { deploy } from './deploy';
-import { dev } from './dev';
+import { target } from './target';
 
 export const app = createBranch({
   name: 'app',
   description: 'Create or manage an alwaysAI application',
-  subcommands: [init, dev, deploy, show, models],
+  subcommands: [init, target, deploy, show, models],
 });

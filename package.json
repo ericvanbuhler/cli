@@ -27,7 +27,7 @@
     "postversion": "npm publish"
   },
   "dependencies": {
-    "@alwaysai/always-cli": "0.0.0-9",
+    "@alwaysai/always-cli": "0.0.0-11",
     "@alwaysai/cloud-api": "0.0.0-10",
     "@alwaysai/cloud-api-nodejs": "0.0.0-8",
     "@alwaysai/codecs": "0.0.0-5",
@@ -40,7 +40,7 @@
     "@types/ssh2": "0.5.38",
     "@types/tar": "4.0.0",
     "chalk": "2.4.2",
-    "firebase": "5.10.0",
+    "firebase": "5.10.1",
     "http-status-codes": "1.3.2",
     "io-ts": "1.8.5",
     "lodash.difference": "4.5.0",
@@ -48,7 +48,7 @@
     "ora": "3.4.0",
     "prompts": "2.0.4",
     "remote-origin-url": "2.0.0",
-    "ssh2": "0.8.2",
+    "ssh2": "0.8.3",
     "tar": "4.4.8"
   },
   "devDependencies": {
@@ -56,14 +56,14 @@
     "@alwaysai/tsconfig": "0.0.0",
     "@alwaysai/tslint-config": "0.0.3",
     "@types/jest": "24.0.11",
-    "@types/node": "11.13.5",
+    "@types/node": "11.13.8",
     "jest": "24.7.1",
     "rimraf": "2.6.3",
     "tempy": "0.3.0",
     "ts-jest": "24.0.2",
     "ts-node": "8.1.0",
     "tslint": "5.16.0",
-    "typescript": "3.4.3"
+    "typescript": "3.4.5"
   },
   "files": [
     "src",

@@ -8,18 +8,25 @@ import { join } from 'path';
 import { homedir, userInfo } from 'os';
 import { checkTerminalIsInteractive } from '../prompt';
 
-export const DEFAULT_USERNAME = userInfo().username;
-export const DEFAULT_PORT = 22;
-
 const REMOTE_COMMAND_FAILED = 'REMOTE_COMMAND_FAILED';
 
-type Config = Partial<{
-  hostname: string;
+type DefaultConfig = {
   port: number;
   username: string;
-  privateKey: string;
-  password: string;
-}>;
+  privateKeyPath: string;
+};
+
+export const SSH_DEFAULT: DefaultConfig = {
+  port: 22,
+  username: userInfo().username,
+  privateKeyPath: join(homedir(), '.ssh', 'id_rsa'),
+};
+
+type Config = {
+  hostname: string;
+  path: string;
+  password?: string;
+} & Partial<DefaultConfig>;
 
 type ExecResult = {
   stdout: string;
@@ -27,34 +34,27 @@ type ExecResult = {
   code: number;
 };
 
-const DOT_SSH_DIR = join(homedir(), '.ssh');
-
-async function readDefaultPrivateKey() {
-  try {
-    return await promisify(readFile)(join(DOT_SSH_DIR, 'id_rsa'), {
-      encoding: 'utf8',
-    });
-  } catch (ex) {
-    if (ex.code !== 'ENOENT') {
-      throw ex;
-    }
-    return undefined;
-  }
-}
-
 export class SshClient {
   private readonly ssh2 = new Ssh2Client();
   private readonly config: Config;
 
-  public constructor(config: Config = {}) {
+  public constructor(config: Config) {
     this.config = config;
   }
 
   public async connect() {
-    const { hostname, username, password, privateKey, port = DEFAULT_PORT } = this.config;
-    let defaultPrivateKey: string | undefined;
-    if (!privateKey && !password) {
-      defaultPrivateKey = await readDefaultPrivateKey();
+    let privateKey: string | undefined;
+    try {
+      privateKey = await promisify(readFile)(
+        this.config.privateKeyPath || SSH_DEFAULT.privateKeyPath,
+        {
+          encoding: 'utf8',
+        },
+      );
+    } catch (ex) {
+      if (ex.code !== 'ENOENT') {
+        throw ex;
+      }
     }
     await new Promise((resolve, reject) => {
       this.ssh2.on('ready', () => {
@@ -62,16 +62,30 @@ export class SshClient {
       });
       this.ssh2.on('error', reject);
       this.ssh2.connect({
-        host: hostname,
-        port,
-        privateKey: privateKey || defaultPrivateKey,
-        username: username || DEFAULT_USERNAME,
-        password,
+        host: this.config.hostname,
+        port: this.config.port || SSH_DEFAULT.port,
+        privateKey,
+        username: this.config.username || SSH_DEFAULT.username,
+        password: this.config.password,
       });
     });
   }
 
-  public async shell(opts: { cwd?: string } = {}) {
+  public async mkdirp() {
+    try {
+      await this.runCommand(`mkdir -p "${this.config.path}"`, { skipCd: true });
+    } catch (ex) {
+      if (ex && ex.code === REMOTE_COMMAND_FAILED && ex.data) {
+        const { stderr } = ex.data;
+        if (stderr && typeof stderr === 'string') {
+          throw new Error(stderr);
+        }
+      }
+      throw ex;
+    }
+  }
+
+  public async shell() {
     return new Promise<ClientChannel>((resolve, reject) => {
       checkTerminalIsInteractive();
       process.stdin.setRawMode!(true);
@@ -90,24 +104,30 @@ export class SshClient {
           }
           resolve();
         });
-        if (opts.cwd) {
-          channel.write(`cd '${opts.cwd}'\n`);
-        }
+        channel.write(`cd '${this.config.path}'\n`);
         process.stdin.pipe(channel);
         channel.stdout.pipe(process.stdout);
       });
     });
   }
 
-  public runCommand(command: string, input?: Readable) {
+  private get cdCommand() {
+    return `cd "${this.config.path}"`;
+  }
+
+  public runCommand(
+    command: string,
+    opts: Partial<{ input: Readable; skipCd: boolean }> = {},
+  ) {
     return new Promise<ExecResult>((resolve, reject) => {
-      this.ssh2.exec(command, (err, channel) => {
+      const fullCommand = opts.skipCd ? command : `${this.cdCommand} && ${command}`;
+      this.ssh2.exec(fullCommand, (err, channel) => {
         if (err) {
           reject(err);
           return;
         }
-        if (input) {
-          input.pipe(channel);
+        if (opts.input) {
+          opts.input.pipe(channel);
         }
         const resolvedValue: Partial<ExecResult> = {
           stdout: '',
@@ -136,7 +156,7 @@ export class SshClient {
 
   public runCommand2(command: string) {
     return new Promise<void>((resolve, reject) => {
-      this.ssh2.exec(command, { pty: true }, (err, channel) => {
+      this.ssh2.exec(`${this.cdCommand} && ${command}`, { pty: true }, (err, channel) => {
         if (err) {
           reject(err);
           return;
@@ -154,23 +174,5 @@ export class SshClient {
         channel.stderr.pipe(process.stderr);
       });
     });
-  }
-
-  public async mkdirp(path: string) {
-    try {
-      await this.runCommand(`mkdir -p "${path}"`);
-    } catch (ex) {
-      if (ex && ex.code === REMOTE_COMMAND_FAILED && ex.data) {
-        const { stderr } = ex.data;
-        if (stderr && typeof stderr === 'string') {
-          throw new Error(stderr);
-        }
-      }
-      throw ex;
-    }
-  }
-
-  public async unPackage(destination: string, packageStream: Readable) {
-    await this.runCommand(`cd ${destination} && tar xvfz -`, packageStream);
   }
 }

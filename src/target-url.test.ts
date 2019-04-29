@@ -1,17 +1,17 @@
-import { SandboxUrl } from './sandbox-url';
+import { TargetUrl } from './target-url';
 
-const { parse, serialize } = SandboxUrl;
+const { parse, serialize } = TargetUrl;
 
 const data: ([string, ReturnType<typeof parse>])[] = [
-  ['ssh://1/foo', { protocol: 'ssh:', hostname: '1', pathname: '/foo' }],
+  ['ssh://1/foo', { protocol: 'ssh:', hostname: '1', path: '/foo' }],
   [
     'ssh://localhost:23/foo',
-    { protocol: 'ssh:', port: 23, hostname: 'localhost', pathname: '/foo' },
+    { protocol: 'ssh:', port: 23, hostname: 'localhost', path: '/foo' },
   ],
-  ['ssh://:::23/foo', { protocol: 'ssh:', hostname: '[:::23]', pathname: '/foo' }],
+  ['ssh://:::23/foo', { protocol: 'ssh:', hostname: '[:::23]', path: '/foo' }],
   [
     'ssh://user@h/foo',
-    { protocol: 'ssh:', username: 'user', hostname: 'h', pathname: '/foo' },
+    { protocol: 'ssh:', username: 'user', hostname: 'h', path: '/foo' },
   ],
   [
     'ssh://user:pass@foo/foo',
@@ -20,15 +20,15 @@ const data: ([string, ReturnType<typeof parse>])[] = [
       username: 'user',
       password: 'pass',
       hostname: 'foo',
-      pathname: '/foo',
+      path: '/foo',
     },
   ],
 ];
 
-describe('SandboxUrl', () => {
-  for (const [serialized, sandboxUrl] of data) {
+describe('TargetUrl', () => {
+  for (const [serialized, targetUrl] of data) {
     it(`parses "${serialized}"`, () => {
-      expect(parse(serialized)).toEqual(sandboxUrl);
+      expect(parse(serialized)).toEqual(targetUrl);
     });
 
     it('idempotency check', () => {
