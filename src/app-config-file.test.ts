@@ -6,7 +6,7 @@ const subject = AppConfigFile(tempy.directory());
 describe(AppConfigFile.name, () => {
   it(`${subject.addModel}`, () => {
     subject.write({});
-    subject.addModel('foo');
+    subject.addModel('foo', '*');
     expect(subject.read().models).toEqual({ foo: '*' });
   });
 

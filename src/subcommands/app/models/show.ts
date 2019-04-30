@@ -7,5 +7,6 @@ const action: typeof appShow.action = async (args, options) => {
 
 export const showModels = {
   ...appShow,
+  description: 'Show this application\'s "models" configuration',
   action,
 };

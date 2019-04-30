@@ -3,7 +3,6 @@ import { createRpcClient as originalCreateRpcClient } from '@alwaysai/cloud-api-
 
 import { readSystemId } from './cli-config-file';
 import { credentialsStore } from './credentials-store';
-import { firebaseAuth } from './firebase-auth';
 
 let cloudApiUrl: string;
 switch (readSystemId()) {
@@ -21,20 +20,12 @@ switch (readSystemId()) {
 }
 
 export function createRpcClient() {
-  const { idToken, password, email } = credentialsStore.read();
+  const { idToken } = credentialsStore.read();
   const rpcClient = originalCreateRpcClient({
     idToken,
     cloudApiUrl,
     async getIdToken() {
-      const { user } = await firebaseAuth.signInWithEmailAndPassword(email, password);
-      if (!user) {
-        throw new Error('Expected "user"');
-      }
-      const freshIdToken = await user.getIdToken();
-      credentialsStore.update(config => {
-        config.idToken = freshIdToken;
-      });
-      return freshIdToken;
+      return idToken;
     },
   });
   return rpcClient as RpcApi;

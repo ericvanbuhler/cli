@@ -6,7 +6,6 @@ import * as t from 'io-ts';
 const codec = t.type({
   email: t.string,
   idToken: t.string,
-  password: t.string,
 });
 
 const ENOENT = {

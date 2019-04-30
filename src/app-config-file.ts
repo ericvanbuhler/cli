@@ -23,10 +23,10 @@ export function AppConfigFile(dir = process.cwd()) {
   const configFile = ConfigFile({ path, codec, ENOENT });
   return {
     ...configFile,
-    addModel(id: string) {
+    addModel(id: string, version: string) {
       return configFile.update(config => {
         config.models = config.models || {};
-        config.models[id] = '*';
+        config.models[id] = version;
       });
     },
     removeModel(id: string) {

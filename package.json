@@ -28,7 +28,7 @@
   },
   "dependencies": {
     "@alwaysai/always-cli": "0.0.0-11",
-    "@alwaysai/cloud-api": "0.0.0-10",
+    "@alwaysai/cloud-api": "0.0.0-11",
     "@alwaysai/cloud-api-nodejs": "0.0.0-8",
     "@alwaysai/codecs": "0.0.0-5",
     "@alwaysai/config-nodejs": "0.0.0-4",
@@ -48,7 +48,7 @@
     "ora": "3.4.0",
     "prompts": "2.0.4",
     "remote-origin-url": "2.0.0",
-    "ssh2": "0.8.3",
+    "ssh2": "0.8.4",
     "tar": "4.4.8"
   },
   "devDependencies": {

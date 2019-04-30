@@ -1,8 +1,6 @@
 import ora = require('ora');
 
-export function spinOnPromise(...args: Parameters<typeof ora.promise>) {
-  const promise = args[0];
-  const opts = args[1];
+export function spinOnPromise<T>(promise: Promise<T>, opts?: ora.Options | string) {
   ora.promise(promise, opts);
   return promise;
 }

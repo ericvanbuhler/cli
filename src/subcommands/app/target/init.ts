@@ -10,7 +10,7 @@ import chalk from 'chalk';
 
 import { prompt, getNonInteractiveStandardStreamName } from '../../../prompt';
 import { spinOnPromise } from '../../../spin-on-promise';
-import { yes } from '../yes';
+import { yes } from '../../yes';
 import { targetConfigFile } from './target-config-file';
 import { SSH_DEFAULT, SshClient } from '../../../ssh-client';
 
