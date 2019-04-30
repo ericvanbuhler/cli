@@ -51,6 +51,7 @@
     "ora": "3.4.0",
     "prompts": "2.0.4",
     "remote-origin-url": "2.0.0",
+    "rimraf": "2.6.3",
     "ssh2": "0.8.4",
     "tar": "4.4.8"
   },
@@ -61,7 +62,6 @@
     "@types/jest": "24.0.12",
     "@types/node": "11.13.8",
     "jest": "24.7.1",
-    "rimraf": "2.6.3",
     "tempy": "0.3.0",
     "ts-jest": "24.0.2",
     "ts-node": "8.1.0",
