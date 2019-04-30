@@ -2,7 +2,7 @@ import { basename } from 'path';
 
 import { createLeaf, TerseError } from '@alwaysai/always-cli';
 
-import { yes } from '../yes';
+import { yes } from '../../inputs/yes';
 import { modelConfigFile } from './model-config-file';
 import { checkTerminalIsInteractive } from '../../prompt';
 

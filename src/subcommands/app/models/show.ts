@@ -1,12 +1,10 @@
 import { show as appShow } from '../show';
 
-const action: typeof appShow.action = async (args, options) => {
-  const appConfig = await appShow.action(args, options);
-  return appConfig.models || {};
-};
-
-export const showModels = {
+export const showModels: typeof appShow = {
   ...appShow,
   description: 'Show this application\'s "models" configuration',
-  action,
+  async action(args, options) {
+    const appConfig = await appShow.action(args, options);
+    return appConfig.models || {};
+  },
 };

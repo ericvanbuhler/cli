@@ -1,19 +1,15 @@
 import { createLeaf, TerseError } from '@alwaysai/always-cli';
 import { ErrorCode } from '@alwaysai/cloud-api';
 
-import { cloudApi } from '../../../cloud-api';
 import { appConfigFile } from '../../../app-config-file';
 import { ModelId } from '../../../model-id';
-import { ids } from './ids';
+import { ids } from '../../../inputs/ids';
 import { createRpcClient } from '../../../create-rpc-client';
 import { spinOnPromise } from '../../../spin-on-promise';
 
 export const addModels = createLeaf({
   name: 'add',
   description: 'Add one or more alwaysAI models to this app',
-  options: {
-    cloudApi,
-  },
   args: ids,
   async action(ids) {
     appConfigFile.read();

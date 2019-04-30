@@ -4,7 +4,7 @@ import origin = require('remote-origin-url');
 
 import { createLeaf, TerseError } from '@alwaysai/always-cli';
 
-import { yes } from '../yes';
+import { yes } from '../../inputs/yes';
 import { appConfigFile } from '../../app-config-file';
 import { prompt, checkTerminalIsInteractive } from '../../prompt';
 

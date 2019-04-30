@@ -20,7 +20,7 @@ const set = createLeaf({
   name: 'set',
   description: `Set an "${CLI_NAME}" configuration value`,
   options: {
-    systemId: createOneOfInput({ values: SYSTEM_IDS }),
+    systemId: createOneOfInput({ values: SYSTEM_IDS, required: true }),
   },
   action(_, opts) {
     if (opts.systemId) {
