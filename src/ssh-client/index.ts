@@ -4,7 +4,7 @@ import { Readable } from 'stream';
 import { CodedError } from '@carnesen/coded-error';
 import { readFile } from 'fs';
 import { promisify } from 'util';
-import { join } from 'path';
+import { join, isAbsolute, resolve } from 'path';
 import { homedir, userInfo } from 'os';
 import { checkTerminalIsInteractive } from '../prompt';
 
@@ -39,6 +39,9 @@ export class SshClient {
   private readonly config: Config;
 
   public constructor(config: Config) {
+    if (!isAbsolute(config.path)) {
+      throw new Error(`Filesystem path "${config.path}" is not absolute`);
+    }
     this.config = config;
   }
 
@@ -71,9 +74,23 @@ export class SshClient {
     });
   }
 
-  public async mkdirp() {
+  public async mkdirp(path = '.') {
     try {
-      await this.runCommand(`mkdir -p "${this.config.path}"`, { skipCd: true });
+      await this.runCommand(`mkdir -p "${this.toAbsolute(path)}"`, { cwd: '' });
+    } catch (ex) {
+      if (ex && ex.code === REMOTE_COMMAND_FAILED && ex.data) {
+        const { stderr } = ex.data;
+        if (stderr && typeof stderr === 'string') {
+          throw new Error(stderr);
+        }
+      }
+      throw ex;
+    }
+  }
+
+  public async rimraf(path = '.') {
+    try {
+      await this.runCommand(`rm -rf "${this.toAbsolute(path)}"`, { cwd: '' });
     } catch (ex) {
       if (ex && ex.code === REMOTE_COMMAND_FAILED && ex.data) {
         const { stderr } = ex.data;
@@ -111,23 +128,27 @@ export class SshClient {
     });
   }
 
-  private get cdCommand() {
-    return `cd "${this.config.path}"`;
+  public toAbsolute(path: string) {
+    if (isAbsolute(path)) {
+      return path;
+    }
+    return resolve(this.config.path, path);
   }
 
   public runCommand(
     command: string,
-    opts: Partial<{ input: Readable; skipCd: boolean }> = {},
+    opts: Partial<{ input: Readable; cwd: string }> = {},
   ) {
+    const { cwd = '.', input } = opts;
     return new Promise<ExecResult>((resolve, reject) => {
-      const fullCommand = opts.skipCd ? command : `${this.cdCommand} && ${command}`;
+      const fullCommand = cwd ? `cd "${this.toAbsolute(cwd)}" && ${command}` : command;
       this.ssh2.exec(fullCommand, (err, channel) => {
         if (err) {
           reject(err);
           return;
         }
-        if (opts.input) {
-          opts.input.pipe(channel);
+        if (input) {
+          input.pipe(channel);
         }
         const resolvedValue: Partial<ExecResult> = {
           stdout: '',
@@ -156,23 +177,27 @@ export class SshClient {
 
   public runCommand2(command: string) {
     return new Promise<void>((resolve, reject) => {
-      this.ssh2.exec(`${this.cdCommand} && ${command}`, { pty: true }, (err, channel) => {
-        if (err) {
-          reject(err);
-          return;
-        }
-
-        channel.on('close', (code: any) => {
-          if (code !== 0) {
-            const message = `Remote command "${command}" exited with code ${code}`;
-            reject(new CodedError(message, code));
-          } else {
-            resolve();
+      this.ssh2.exec(
+        `cd "${this.toAbsolute('.')}" && ${command}`,
+        { pty: true },
+        (err, channel) => {
+          if (err) {
+            reject(err);
+            return;
           }
-        });
-        channel.stdout.pipe(process.stdout);
-        channel.stderr.pipe(process.stderr);
-      });
+
+          channel.on('close', (code: any) => {
+            if (code !== 0) {
+              const message = `Remote command "${command}" exited with code ${code}`;
+              reject(new CodedError(message, code));
+            } else {
+              resolve();
+            }
+          });
+          channel.stdout.pipe(process.stdout);
+          channel.stderr.pipe(process.stderr);
+        },
+      );
     });
   }
 }
