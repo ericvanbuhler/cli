@@ -32,7 +32,7 @@ export const install = createLeaf({
 
     const tarbombStream = createTarbombStream(process.cwd());
     await spinOnPromise(
-      sshClient.runCommand('tar xz -', { input: tarbombStream, cwd: '.' }),
+      sshClient.runCommand('tar xz', { input: tarbombStream, cwd: '.' }),
       'Copying application',
     );
 
@@ -98,7 +98,7 @@ export const install = createLeaf({
           .substring(2),
       );
       await sshClient.mkdirp(tmpDir);
-      await sshClient.runCommand('tar xz -', {
+      await sshClient.runCommand('tar xz', {
         input: modelPackageStream,
         cwd: tmpDir,
       });
