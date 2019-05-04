@@ -29,7 +29,6 @@
   "dependencies": {
     "@alwaysai/alwayscli": "0.0.0-12",
     "@alwaysai/cloud-api": "0.0.0-11",
-    "@alwaysai/cloud-api-nodejs": "0.0.0-8",
     "@alwaysai/codecs": "0.0.0-5",
     "@alwaysai/config-nodejs": "0.0.0-4",
     "@carnesen/coded-error": "0.1.0",
