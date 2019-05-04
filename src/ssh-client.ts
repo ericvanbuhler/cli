@@ -6,7 +6,7 @@ import { readFile } from 'fs';
 import { promisify } from 'util';
 import { join, isAbsolute, resolve } from 'path';
 import { homedir, userInfo } from 'os';
-import { checkTerminalIsInteractive } from '../prompt';
+import { checkTerminalIsInteractive } from './prompt';
 
 const REMOTE_COMMAND_FAILED = 'REMOTE_COMMAND_FAILED';
 

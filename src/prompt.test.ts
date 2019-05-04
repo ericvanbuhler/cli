@@ -1,4 +1,4 @@
-import { runAndCatch } from '@alwaysai/always-cli';
+import { runAndCatch } from '@alwaysai/alwayscli';
 
 import { prompt } from './prompt';
 

@@ -1,4 +1,4 @@
-import { createLeaf } from '@alwaysai/always-cli';
+import { createLeaf } from '@alwaysai/alwayscli';
 import { appConfigFile } from '../../../app-config-file';
 import { fakeSpinner } from '../../../fake-spinner';
 import { ids } from '../../../inputs/ids';

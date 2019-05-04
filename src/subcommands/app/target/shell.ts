@@ -1,4 +1,4 @@
-import { createLeaf } from '@alwaysai/always-cli';
+import { createLeaf } from '@alwaysai/alwayscli';
 import { targetConfigFile } from './target-config-file';
 
 export const shell = createLeaf({

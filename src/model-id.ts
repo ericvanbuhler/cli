@@ -1,4 +1,4 @@
-import { TerseError } from '@alwaysai/always-cli';
+import { TerseError } from '@alwaysai/alwayscli';
 
 export type ModelId = {
   publisher: string;

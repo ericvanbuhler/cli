@@ -1,4 +1,4 @@
-import { createLeaf, TerseError } from '@alwaysai/always-cli';
+import { createLeaf, TerseError } from '@alwaysai/alwayscli';
 import { ErrorCode } from '@alwaysai/cloud-api';
 
 import { appConfigFile } from '../../../app-config-file';

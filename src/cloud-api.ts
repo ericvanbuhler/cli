@@ -1,4 +1,4 @@
-import { createStringInput } from '@alwaysai/always-cli';
+import { createStringInput } from '@alwaysai/alwayscli';
 import { CLOUD_API_URL } from '@alwaysai/cloud-api';
 
 export const cloudApi = createStringInput({

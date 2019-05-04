@@ -1,4 +1,4 @@
-import { createLeaf, createStringArrayInput } from '@alwaysai/always-cli';
+import { createLeaf, createStringArrayInput } from '@alwaysai/alwayscli';
 import { targetConfigFile } from './target-config-file';
 
 export const exec = createLeaf({

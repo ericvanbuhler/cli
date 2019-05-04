@@ -4,7 +4,7 @@ import {
   createStringInput,
   createNumberInput,
   UsageError,
-} from '@alwaysai/always-cli';
+} from '@alwaysai/alwayscli';
 import { isAbsolute, basename } from 'path';
 import chalk from 'chalk';
 

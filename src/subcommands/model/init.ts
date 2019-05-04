@@ -1,6 +1,6 @@
 import { basename } from 'path';
 
-import { createLeaf, TerseError } from '@alwaysai/always-cli';
+import { createLeaf, TerseError } from '@alwaysai/alwayscli';
 
 import { yes } from '../../inputs/yes';
 import { modelConfigFile } from './model-config-file';

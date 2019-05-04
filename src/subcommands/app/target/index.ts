@@ -1,4 +1,4 @@
-import { createBranch } from '@alwaysai/always-cli';
+import { createBranch } from '@alwaysai/alwayscli';
 import { init } from './init';
 import { shell } from './shell';
 import { start } from './start';

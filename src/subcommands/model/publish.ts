@@ -1,4 +1,4 @@
-import { createLeaf } from '@alwaysai/always-cli';
+import { createLeaf } from '@alwaysai/alwayscli';
 
 import { modelConfigFile } from './model-config-file';
 import { createRpcClient } from '../../create-rpc-client';

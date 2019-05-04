@@ -1,4 +1,4 @@
-import { createLeaf, createJsonInput, createBranch } from '@alwaysai/always-cli';
+import { createLeaf, createJsonInput, createBranch } from '@alwaysai/alwayscli';
 import { rpcMethodSpecs } from '@alwaysai/cloud-api';
 import { createRpcClient } from '../create-rpc-client';
 

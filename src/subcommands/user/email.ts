@@ -1,4 +1,4 @@
-import { Input, UsageError, TerseError } from '@alwaysai/always-cli';
+import { Input, UsageError, TerseError } from '@alwaysai/alwayscli';
 import { prompt } from '../../prompt';
 
 const placeholder = '<address>';

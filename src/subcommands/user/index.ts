@@ -1,5 +1,5 @@
 import chalk from 'chalk';
-import { createLeaf, createBranch, TerseError } from '@alwaysai/always-cli';
+import { createLeaf, createBranch, TerseError } from '@alwaysai/alwayscli';
 
 import { credentialsStore } from '../../credentials-store';
 import { email, promptForEmail } from './email';

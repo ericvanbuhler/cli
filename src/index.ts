@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import { createBranch, createCli, runAndExit } from '@alwaysai/always-cli';
+import { createBranch, createCli, runAndExit } from '@alwaysai/alwayscli';
 import { subcommands } from './subcommands';
 import { CLI_NAME } from './constants';
 

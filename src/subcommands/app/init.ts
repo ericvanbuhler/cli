@@ -2,7 +2,7 @@ import { readFileSync, writeFileSync } from 'fs';
 import { basename, join } from 'path';
 import origin = require('remote-origin-url');
 
-import { createLeaf, TerseError } from '@alwaysai/always-cli';
+import { createLeaf, TerseError } from '@alwaysai/alwayscli';
 
 import { yes } from '../../inputs/yes';
 import { appConfigFile } from '../../app-config-file';

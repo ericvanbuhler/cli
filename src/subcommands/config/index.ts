@@ -3,7 +3,7 @@ import {
   createLeaf,
   createOneOfInput,
   createFlagInput,
-} from '@alwaysai/always-cli';
+} from '@alwaysai/alwayscli';
 import { cliConfigFile } from '../../cli-config-file';
 import { CLI_NAME } from '../../constants';
 import { SYSTEM_IDS } from '@alwaysai/codecs';

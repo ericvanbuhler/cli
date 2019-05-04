@@ -1,4 +1,4 @@
-import { createLeaf, TerseError } from '@alwaysai/always-cli';
+import { createLeaf, TerseError } from '@alwaysai/alwayscli';
 import { targetConfigFile } from './target-config-file';
 import { appConfigFile } from '../../../app-config-file';
 

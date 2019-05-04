@@ -1,4 +1,4 @@
-import { createBranch } from '@alwaysai/always-cli';
+import { createBranch } from '@alwaysai/alwayscli';
 import { list } from './list';
 
 export const models = createBranch({

@@ -4,7 +4,7 @@ import * as t from 'io-ts';
 import * as c from '@alwaysai/codecs';
 
 import { ConfigFile, ALWAYSAI_CONFIG_DIR } from '@alwaysai/config-nodejs';
-import { TERSE } from '@alwaysai/always-cli';
+import { TERSE } from '@alwaysai/alwayscli';
 import { CLI_NAME } from './constants';
 
 const props = {

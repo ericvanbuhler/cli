@@ -1,5 +1,5 @@
 import prompts = require('prompts');
-import { TerseError } from '@alwaysai/always-cli';
+import { TerseError } from '@alwaysai/alwayscli';
 
 type Questions<T extends string> = prompts.PromptObject<T>[];
 
