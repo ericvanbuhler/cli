@@ -32,7 +32,6 @@
     "@alwaysai/codecs": "0.0.0-5",
     "@alwaysai/config-nodejs": "0.0.0-4",
     "@aws-amplify/auth": "1.2.22",
-    "@alwaysai/app-installer": "bitbucket:alwaysai-app-installer@e30d451",
     "@carnesen/coded-error": "0.1.0",
     "@types/download": "6.2.4",
     "@types/lodash.difference": "4.5.6",
