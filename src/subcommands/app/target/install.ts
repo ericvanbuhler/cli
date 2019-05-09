@@ -117,7 +117,7 @@ export const install = createLeaf({
       spinOnPromise(Promise.resolve(), 'No models to install');
     }
 
-    const reqFile = 'requirements.txt'
+    const reqFile = 'requirements.txt';
     if (existsSync(reqFile)) {
       async function installPythonDeps(reqFile: string) {
         const venvRoot = 'venv';
@@ -136,7 +136,7 @@ export const install = createLeaf({
           cwd: '.',
         });
       } // End of install Python dependencies
-      await spinOnPromise(installPythonDeps(reqFile), `Installing Python dependencies`);
+      await spinOnPromise(installPythonDeps(reqFile), 'Installing Python dependencies');
     } else {
       spinOnPromise(Promise.reject(), `${reqFile} file not found!`);
     }
