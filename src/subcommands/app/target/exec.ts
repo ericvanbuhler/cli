@@ -8,9 +8,9 @@ export const exec = createLeaf({
     placeholder: '<command> [<args>]',
     required: true,
   }),
-  async action(args) {
-    const sshClient = await targetConfigFile.connectToTarget();
-    const { stdout } = await sshClient.runCommand(args.join(' '));
-    return stdout;
+  action([exe, ...args]) {
+    const spawner = targetConfigFile.readSpawner();
+    const config = targetConfigFile.read();
+    spawner.runForeground({ exe, args, cwd: config.path });
   },
 });
