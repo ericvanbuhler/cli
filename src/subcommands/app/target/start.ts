@@ -15,6 +15,10 @@ export const start = createLeaf({
     }
     const [exe, ...args] = script.split(' ');
     const spawner = targetConfigFile.readSpawner();
-    spawner.runForeground({ exe, args, cwd: spawner.path });
+    let fullExe = exe;
+    if (fullExe === 'python') {
+      fullExe = `venv/bin/${fullExe}`;
+    }
+    spawner.runForeground({ exe: fullExe, args, cwd: spawner.path });
   },
 });
