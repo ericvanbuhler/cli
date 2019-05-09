@@ -125,6 +125,7 @@ export const install = createLeaf({
           await spawner.runCommand({
             exe: 'virtualenv',
             args: ['--system-site-packages', venvRoot],
+            cwd: '.',
           });
         } catch (_) {
           throw new TerseError('Target does not have virtualenv installed!');
@@ -132,6 +133,7 @@ export const install = createLeaf({
         await spawner.runCommand({
           exe: `${venvRoot}/bin/pip`,
           args: ['install', '-r', reqFile],
+          cwd: '.',
         });
       } // End of install Python dependencies
       await spinOnPromise(installPythonDeps(reqFile), `Installing Python dependencies`);
