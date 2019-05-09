@@ -4,7 +4,8 @@
     "create",
     "deserialize",
     "stream",
-    "tarbomb"
+    "tarbomb",
+    "workdir"
   ],
   "tslint.enable": true
 }

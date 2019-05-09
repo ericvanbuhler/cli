@@ -2,7 +2,6 @@ import {
   createLeaf,
   TerseError,
   createStringInput,
-  createNumberInput,
   UsageError,
 } from '@alwaysai/alwayscli';
 import { isAbsolute, basename } from 'path';
@@ -12,7 +11,7 @@ import { prompt, getNonInteractiveStandardStreamName } from '../../../prompt';
 import { spinOnPromise } from '../../../spin-on-promise';
 import { yes } from '../../../inputs/yes';
 import { targetConfigFile } from './target-config-file';
-import { SSH_DEFAULT, SshClient } from '../../../ssh-client';
+import { SshSpawner } from '../../../spawner/ssh-spawner';
 
 function validatePath(value: string) {
   return !value
@@ -99,18 +98,6 @@ const options = {
   hostname: createStringInput({
     description: 'Hostname or IP address',
   }),
-  port: createNumberInput({
-    description: `SSH port number (default ${SSH_DEFAULT.port})`,
-  }),
-  username: createStringInput({
-    description: `SSH username (default "${SSH_DEFAULT.username}")`,
-  }),
-  password: createStringInput({
-    description: 'Password for SSH authentication (if necessary)',
-  }),
-  privateKeyPath: createStringInput({
-    description: 'Filesystem path to an SSH private key (if necessary)',
-  }),
   path,
 };
 
@@ -182,30 +169,6 @@ export const init = createLeaf({
           validate: value => (!value ? 'Value is required' : true),
         },
         {
-          type: 'number',
-          name: 'port',
-          message: options.port.getDescription(),
-          initial: promptInitialValues.port,
-        },
-        {
-          type: 'text',
-          name: 'username',
-          message: options.username.getDescription(),
-          initial: promptInitialValues.username,
-        },
-        {
-          type: 'password',
-          name: 'password',
-          message: options.password.getDescription(),
-          initial: promptInitialValues.password,
-        },
-        {
-          type: 'text',
-          name: 'privateKeyPath',
-          message: options.privateKeyPath.getDescription(),
-          initial: promptInitialValues.password,
-        },
-        {
           type: 'text',
           name: 'path',
           message: options.path.getDescription(),
@@ -227,10 +190,10 @@ export const init = createLeaf({
     console.log();
     console.log('Check permissions and connectivity:');
     console.log();
-    const sshClient = new SshClient(nextConfig as any);
+    const ssh = SshSpawner(nextConfig as any);
     let connected = false;
     try {
-      await spinOnPromise(sshClient.connect(), 'Test connection');
+      await spinOnPromise(ssh.runCommand({ exe: 'ls' }), 'Test connection');
       connected = true;
     } catch (ex) {
       await confirmSave(
@@ -241,7 +204,7 @@ export const init = createLeaf({
 
     if (connected) {
       try {
-        await spinOnPromise(sshClient.mkdirp(), 'Create target directory');
+        await spinOnPromise(ssh.mkdirp(), 'Create target directory');
       } catch (ex) {
         await confirmSave(
           `${chalk.red('Error:')} ${ex.message || 'Could not create directory'}`,
@@ -250,6 +213,7 @@ export const init = createLeaf({
       }
     }
 
+    nextConfig.protocol = 'ssh:';
     const { changed } = targetConfigFile.write(nextConfig as any);
     console.log();
     if (changed) {

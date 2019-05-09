@@ -27,12 +27,12 @@ export const install = createLeaf({
   async action() {
     const appConfig = appConfigFile.read();
 
-    const sshClient = await targetConfigFile.connectToTarget();
-    await sshClient.mkdirp();
+    const spawner = targetConfigFile.readSpawner();
+    await spawner.mkdirp('.');
 
     const tarbombStream = createTarbombStream(process.cwd());
     await spinOnPromise(
-      sshClient.runCommand('tar xz', { input: tarbombStream, cwd: '.' }),
+      spawner.untar(tarbombStream, spawner.path),
       'Copying application',
     );
 
@@ -45,13 +45,15 @@ export const install = createLeaf({
     async function installModel(id: string, version: string) {
       const returnValue = { changed: false };
       const { publisher, name } = ModelId.parse(id);
-      const modelDir = `models/@${publisher}/${name}`;
+      const modelDir = join(spawner.path, 'models', `@${publisher}`, name);
       let installedVersion: string | undefined = undefined;
       try {
-        const { stdout } = await sshClient.runCommand(
-          `cat ${modelDir}/${MODEL_CONFIG_FILE_NAME}`,
-        );
-        const parsed = JSON.parse(stdout);
+        const output = await spawner.runCommand({
+          exe: 'cat',
+          args: [`${modelDir}/${MODEL_CONFIG_FILE_NAME}`],
+          cwd: '.',
+        });
+        const parsed = JSON.parse(output);
         installedVersion = parsed.version;
       } catch (_) {
         // TODO finer-grained error handling
@@ -92,19 +94,22 @@ export const install = createLeaf({
         }
       }
       const tmpDir = join(
-        '.tmp',
+        spawner.path,
+        'tmp',
         Math.random()
           .toString(36)
           .substring(2),
       );
-      await sshClient.mkdirp(tmpDir);
-      await sshClient.runCommand('tar xz', {
-        input: modelPackageStream,
-        cwd: tmpDir,
+      await spawner.mkdirp(tmpDir);
+      await spawner.untar(modelPackageStream, tmpDir);
+      const output = await spawner.runCommand({ exe: 'ls', cwd: tmpDir });
+      const fileName = output.trim();
+      await spawner.rimraf(modelDir);
+      await spawner.mkdirp(dirname(modelDir));
+      await spawner.runCommand({
+        exe: 'mv',
+        args: [join(tmpDir, fileName), modelDir],
       });
-      await sshClient.rimraf(modelDir);
-      await sshClient.mkdirp(dirname(modelDir));
-      await sshClient.runCommand(`mv "${tmpDir}"/* "${modelDir}"`);
       return returnValue;
     } // End of install one
 

@@ -2,9 +2,11 @@
 
 # alwaysAI files
 alwaysai.*.json
-
-/coverage
+/models
 /app.py
+
+# Code coverage output
+/coverage
 
 # Logs
 logs

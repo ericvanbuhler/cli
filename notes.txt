@@ -1,5 +1,0 @@
-events:
-- creates a (Freemium) user on the platform
-- upgrades an account to a paid account
-
-use hubspot api to update contact properties
