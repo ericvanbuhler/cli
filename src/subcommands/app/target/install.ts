@@ -139,7 +139,7 @@ export const install = createLeaf({
       } // End of install Python dependencies
       await spinOnPromise(installPythonDeps(reqFile), 'Installing Python dependencies');
     } else {
-      spinOnPromise(Promise.reject(), `${reqFile} file not found!`);
+      await spinOnPromise(Promise.reject(), `${reqFile} file not found!`);
     }
   },
 });
