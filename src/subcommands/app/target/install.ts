@@ -7,7 +7,7 @@ import { Readable } from 'stream';
 import rimraf = require('rimraf');
 import download = require('download');
 
-import { createLeaf } from '@alwaysai/alwayscli';
+import { createLeaf, TerseError } from '@alwaysai/alwayscli';
 
 import { ModelId } from '../../../model-id';
 import { createRpcClient } from '../../../create-rpc-client';
@@ -37,84 +37,106 @@ export const install = createLeaf({
     );
 
     const { models } = appConfig;
-    if (!models || Object.keys(models).length === 0) {
-      spinOnPromise(Promise.resolve(), 'No models to install');
-      return;
-    }
-    const rpc = createRpcClient();
-    async function installModel(id: string, version: string) {
-      const returnValue = { changed: false };
-      const { publisher, name } = ModelId.parse(id);
-      const modelDir = join(spawner.path, 'models', `@${publisher}`, name);
-      let installedVersion: string | undefined = undefined;
-      try {
-        const output = await spawner.runCommand({
-          exe: 'cat',
-          args: [`${modelDir}/${MODEL_CONFIG_FILE_NAME}`],
-          cwd: '.',
-        });
-        const parsed = JSON.parse(output);
-        installedVersion = parsed.version;
-      } catch (_) {
-        // TODO finer-grained error handling
-      }
-
-      if (installedVersion === version) {
-        return returnValue;
-      }
-
-      returnValue.changed = true;
-
-      const modelPackageFileName = `${publisher}-${name}-${version}.tar.gz`;
-      const modelPackagePath = join(MODEL_PACKAGE_CACHE_DIR, modelPackageFileName);
-
-      let modelPackageStream: Readable;
-      if (existsSync(modelPackagePath)) {
-        modelPackageStream = createReadStream(modelPackagePath);
-      } else {
-        // Package does not exist in cache. Let's download it.
-        const { packageUrl } = await rpc.getModelVersion({
-          name,
-          publisher,
-          version,
-        });
-
-        const downloadFileName = `${modelPackageFileName}.download`;
-        const downloadFilePath = join(MODEL_PACKAGE_CACHE_DIR, downloadFileName);
-        await rimrafAsync(downloadFilePath);
+    if (models && Object.keys(models).length > 0) {
+      const rpc = createRpcClient();
+      async function installModel(id: string, version: string) {
+        const returnValue = { changed: false };
+        const { publisher, name } = ModelId.parse(id);
+        const modelDir = join(spawner.path, 'models', `@${publisher}`, name);
+        let installedVersion: string | undefined = undefined;
         try {
-          await download(packageUrl, MODEL_PACKAGE_CACHE_DIR, {
-            extract: false,
-            filename: downloadFileName,
+          const output = await spawner.runCommand({
+            exe: 'cat',
+            args: [`${modelDir}/${MODEL_CONFIG_FILE_NAME}`],
+            cwd: '.',
           });
-          await promisify(rename)(downloadFilePath, modelPackagePath);
-          modelPackageStream = createReadStream(modelPackagePath);
-        } finally {
-          await rimrafAsync(downloadFilePath);
+          const parsed = JSON.parse(output);
+          installedVersion = parsed.version;
+        } catch (_) {
+          // TODO finer-grained error handling
         }
-      }
-      const tmpDir = join(
-        spawner.path,
-        'tmp',
-        Math.random()
-          .toString(36)
-          .substring(2),
-      );
-      await spawner.mkdirp(tmpDir);
-      await spawner.untar(modelPackageStream, tmpDir);
-      const output = await spawner.runCommand({ exe: 'ls', cwd: tmpDir });
-      const fileName = output.trim();
-      await spawner.rimraf(modelDir);
-      await spawner.mkdirp(dirname(modelDir));
-      await spawner.runCommand({
-        exe: 'mv',
-        args: [join(tmpDir, fileName), modelDir],
-      });
-      return returnValue;
-    } // End of install one
 
-    for (const [id, version] of Object.entries(models)) {
-      await spinOnPromise(installModel(id, version), `Installing model ${id}`);
+        if (installedVersion === version) {
+          return returnValue;
+        }
+
+        returnValue.changed = true;
+
+        const modelPackageFileName = `${publisher}-${name}-${version}.tar.gz`;
+        const modelPackagePath = join(MODEL_PACKAGE_CACHE_DIR, modelPackageFileName);
+
+        let modelPackageStream: Readable;
+        if (existsSync(modelPackagePath)) {
+          modelPackageStream = createReadStream(modelPackagePath);
+        } else {
+          // Package does not exist in cache. Let's download it.
+          const { packageUrl } = await rpc.getModelVersion({
+            name,
+            publisher,
+            version,
+          });
+
+          const downloadFileName = `${modelPackageFileName}.download`;
+          const downloadFilePath = join(MODEL_PACKAGE_CACHE_DIR, downloadFileName);
+          await rimrafAsync(downloadFilePath);
+          try {
+            await download(packageUrl, MODEL_PACKAGE_CACHE_DIR, {
+              extract: false,
+              filename: downloadFileName,
+            });
+            await promisify(rename)(downloadFilePath, modelPackagePath);
+            modelPackageStream = createReadStream(modelPackagePath);
+          } finally {
+            await rimrafAsync(downloadFilePath);
+          }
+        }
+        const tmpDir = join(
+          spawner.path,
+          'tmp',
+          Math.random()
+            .toString(36)
+            .substring(2),
+        );
+        await spawner.mkdirp(tmpDir);
+        await spawner.untar(modelPackageStream, tmpDir);
+        const output = await spawner.runCommand({ exe: 'ls', cwd: tmpDir });
+        const fileName = output.trim();
+        await spawner.rimraf(modelDir);
+        await spawner.mkdirp(dirname(modelDir));
+        await spawner.runCommand({
+          exe: 'mv',
+          args: [join(tmpDir, fileName), modelDir],
+        });
+        return returnValue;
+      } // End of install one
+
+      for (const [id, version] of Object.entries(models)) {
+        await spinOnPromise(installModel(id, version), `Installing model ${id}`);
+      }
+    } else {
+      spinOnPromise(Promise.resolve(), 'No models to install');
+    }
+
+    const reqFile = 'requirements.txt'
+    if (existsSync(reqFile)) {
+      async function installPythonDeps(reqFile: string) {
+        const venvRoot = 'venv';
+        try {
+          await spawner.runCommand({
+            exe: 'virtualenv',
+            args: ['--system-site-packages', venvRoot],
+          });
+        } catch (_) {
+          throw new TerseError('Target does not have virtualenv installed!');
+        }
+        await spawner.runCommand({
+          exe: `${venvRoot}/bin/pip`,
+          args: ['install', '-r', reqFile],
+        });
+      } // End of install Python dependencies
+      await spinOnPromise(installPythonDeps(reqFile), `Installing Python dependencies`);
+    } else {
+      spinOnPromise(Promise.reject(), `${reqFile} file not found!`);
     }
   },
 });
