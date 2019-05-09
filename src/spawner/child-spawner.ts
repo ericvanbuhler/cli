@@ -92,7 +92,6 @@ export function ChildSpawner(config: { path: string }) {
     const out = spawnSync(spec.exe, spec.args || [], {
       cwd: spec.cwd ? toAbsolute(spec.cwd) : undefined,
       stdio: 'inherit',
-      // shell: true,
     });
     if (out.error) {
       throw out.error;
