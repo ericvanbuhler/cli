@@ -128,6 +128,7 @@ export const install = createLeaf({
             cwd: '.',
           });
         } catch (_) {
+          // TODO: More fine-grained error handling
           throw new TerseError('Target does not have virtualenv installed!');
         }
         await spawner.runCommand({
