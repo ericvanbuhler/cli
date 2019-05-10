@@ -36,12 +36,15 @@ export const install = createLeaf({
     if (targetConfig.protocol === 'ssh:') {
       await spinOnPromise(
         spawner.untar(createTarbombStream(process.cwd())),
-        'Copy application code',
+        'Application code',
       );
     } else {
-      // protocol == 'docker:'
-      console.log(`${LogSymbols.success} Mount application volume`);
+      // protocol == 'docker:' has the volume mounted so nothing to do here
+      console.log(`${LogSymbols.success} Application code`);
     }
+
+    await installModels(spawner, appConfig.models);
+
     try {
       await spinOnPromise(
         spawner.runCommand({
@@ -49,15 +52,13 @@ export const install = createLeaf({
           args: ['--system-site-packages', VENV_ROOT],
           path: '.',
         }),
-        'Install python virtualenv',
+        'Python virtualenv',
       );
     } catch (ex) {
       throw ex;
       // TODO: More fine-grained error handling
       // throw new TerseError('Target does not have virtualenv installed!');
     }
-
-    await installModels(spawner, appConfig.models);
 
     if (existsSync(REQUIREMENTS_FILE_NAME)) {
       await spinOnPromise(
@@ -66,7 +67,7 @@ export const install = createLeaf({
           args: ['install', '-r', REQUIREMENTS_FILE_NAME],
           path: '.',
         }),
-        'Installing Python dependencies',
+        'Python dependencies',
       );
     } else {
       console.log(`${LogSymbols.success} No ${REQUIREMENTS_FILE_NAME} to install`);
@@ -149,6 +150,6 @@ async function installModels(spawner: Spawner, models: AppConfig['models']) {
   } // End of install one
 
   for (const [id, version] of Object.entries(models)) {
-    await spinOnPromise(installOneModel(id, version), `Install model ${id}`);
+    await spinOnPromise(installOneModel(id, version), `Model ${id}`);
   }
 }

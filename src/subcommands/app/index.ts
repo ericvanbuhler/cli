@@ -6,6 +6,6 @@ import { target } from './target';
 
 export const app = createBranch({
   name: 'app',
-  description: 'Create or manage an alwaysAI application',
+  description: 'Develop an alwaysAI application',
   subcommands: [init, target, show, models],
 });
