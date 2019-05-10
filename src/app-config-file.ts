@@ -13,6 +13,8 @@ const codec = t.partial({
   repository: t.string,
 });
 
+export type AppConfig = t.TypeOf<typeof codec>;
+
 const ENOENT = {
   message: `${APP_CONFIG_FILE_NAME} not found. Did you run "alwaysai app init"?`,
   code: 'TERSE',

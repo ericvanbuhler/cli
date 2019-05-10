@@ -6,6 +6,6 @@ export const show = createLeaf({
   description: "Show this directory's developer configuration",
   options: {},
   action() {
-    return targetConfigFile.read();
+    return targetConfigFile.describe();
   },
 });

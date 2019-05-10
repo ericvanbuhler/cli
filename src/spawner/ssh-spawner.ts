@@ -1,13 +1,21 @@
-import { ChildSpawner, RunCommand, RunForeground, CommandSpec } from './child-spawner';
+import {
+  ChildSpawner,
+  RunCommand,
+  RunForeground,
+  CommandSpec,
+  Spawner,
+} from './child-spawner';
 import { Readable } from 'stream';
+import { PseudoCwd } from './pseudo-cwd';
 
 export type SshSpawner = ReturnType<typeof SshSpawner>;
 export function SshSpawner(config: { path: string; hostname: string }) {
-  const childSpawner = ChildSpawner(config);
-  const { toAbsolute } = childSpawner;
+  const childSpawner = ChildSpawner();
+  const pseudoCwd = PseudoCwd(config.path);
+  const { toAbsolute, cwd } = pseudoCwd;
 
   function translateSpec(spec: CommandSpec) {
-    const command = spec.cwd ? `cd "${toAbsolute(spec.cwd)}" && ${spec.exe}` : spec.exe;
+    const command = spec.path ? `cd "${toAbsolute(spec.path)}" && ${spec.exe}` : spec.exe;
     const translated: CommandSpec = {
       exe: 'ssh',
       args: [config.hostname, command, ...(spec.args || [])],
@@ -40,13 +48,18 @@ export function SshSpawner(config: { path: string; hostname: string }) {
     await runCommand({ exe: 'rm', args: ['-rf', toAbsolute(path)] });
   }
 
-  async function untar(input: Readable, cwd: string) {
-    await runCommand({ exe: 'tar', args: ['-xz'], cwd, input });
+  async function untar(input: Readable, path?: string) {
+    await runCommand({
+      exe: 'tar',
+      args: ['-xz'],
+      path: toAbsolute(path),
+      input,
+    });
   }
 
-  return {
-    path: config.path,
+  const spawner: Spawner = {
     toAbsolute,
+    cwd,
     mkdirp,
     rimraf,
     untar,
@@ -54,4 +67,6 @@ export function SshSpawner(config: { path: string; hostname: string }) {
     runCommand,
     runForeground,
   };
+
+  return spawner;
 }

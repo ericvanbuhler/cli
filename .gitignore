@@ -4,6 +4,7 @@
 alwaysai.*.json
 /models
 /app.py
+/venv
 
 # Code coverage output
 /coverage

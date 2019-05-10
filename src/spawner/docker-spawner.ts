@@ -1,20 +1,37 @@
-import { ChildSpawner, RunCommand, RunForeground, CommandSpec } from './child-spawner';
 import { Readable } from 'stream';
+
+import {
+  ChildSpawner,
+  RunCommand,
+  RunForeground,
+  CommandSpec,
+  Spawner,
+} from './child-spawner';
 import { checkTerminalIsInteractive } from '../prompt';
+import { PseudoCwd } from './pseudo-cwd';
 
 const IMAGE_NAME = 'alwaysai/edgeiq';
+const DEFAULT_PATH = '/app';
 
-export type DockerSpawner = ReturnType<typeof DockerSpawner>;
-export function DockerSpawner(config: { path: string }) {
-  const childSpawner = ChildSpawner(config);
-  const { toAbsolute } = childSpawner;
-  const volumeArgs = ['--volume', `${process.cwd()}:${config.path}`];
+export function DockerSpawner(context: { path?: string } = {}) {
+  const childSpawner = ChildSpawner();
 
-  const getWorkdirArgs = (cwd?: string) => (cwd ? ['--workdir', toAbsolute(cwd)] : []);
+  const pseudoCwd = PseudoCwd(DEFAULT_PATH);
+  pseudoCwd.cd(context.path);
+
+  const { toAbsolute, cwd } = pseudoCwd;
+
+  // Workdir determines the user's current working directory in the container
+  const Workdir = (path?: string) => ['--workdir', toAbsolute(path)];
+
+  // Mount a filesystem volume in the container https://docs.docker.com/storage/volumes/
+  const Volume = () => ['--volume', `${process.cwd()}:${cwd()}`];
 
   function translateSpec(spec: CommandSpec) {
-    const args = ['run', '--interactive', ...volumeArgs];
-    args.push(...getWorkdirArgs(spec.cwd));
+    const args = ['run', '--interactive', ...Volume()];
+    if (spec.path) {
+      args.push(...Workdir(spec.path));
+    }
     args.push(IMAGE_NAME, spec.exe);
 
     if (spec.args) {
@@ -46,8 +63,8 @@ export function DockerSpawner(config: { path: string }) {
         'run',
         '--tty',
         '--interactive',
-        ...volumeArgs,
-        ...getWorkdirArgs(config.path),
+        ...Volume(),
+        ...Workdir(context.path),
         IMAGE_NAME,
         '/bin/bash',
       ],
@@ -62,13 +79,13 @@ export function DockerSpawner(config: { path: string }) {
     await runCommand({ exe: 'rm', args: ['-rf', toAbsolute(path)] });
   }
 
-  async function untar(input: Readable, cwd: string) {
-    await runCommand({ exe: 'tar', args: ['-xz'], cwd, input });
+  async function untar(input: Readable, path?: string) {
+    await runCommand({ exe: 'tar', args: ['-xz'], path: toAbsolute(path), input });
   }
 
-  return {
-    path: config.path,
+  const spawner: Spawner = {
     toAbsolute,
+    cwd,
     mkdirp,
     rimraf,
     untar,
@@ -76,4 +93,6 @@ export function DockerSpawner(config: { path: string }) {
     runCommand,
     runForeground,
   };
+
+  return spawner;
 }

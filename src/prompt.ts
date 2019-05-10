@@ -3,7 +3,7 @@ import { TerseError } from '@alwaysai/alwayscli';
 
 type Questions<T extends string> = prompts.PromptObject<T>[];
 
-export function getNonInteractiveStandardStreamName() {
+export function getNonInteractiveStreamName() {
   for (const streamName of ['stdin' as const, 'stdout' as const]) {
     if (!process[streamName].isTTY) {
       return streamName;
@@ -13,7 +13,7 @@ export function getNonInteractiveStandardStreamName() {
 }
 
 export function checkTerminalIsInteractive() {
-  const streamName = getNonInteractiveStandardStreamName();
+  const streamName = getNonInteractiveStreamName();
   if (streamName) {
     throw new TerseError(
       `This feature is disabled when standard ${

@@ -1,6 +1,5 @@
 import { Readable } from 'stream';
 
-import { isAbsolute, join } from 'path';
 import { spawn, spawnSync } from 'child_process';
 
 import signalExit = require('signal-exit');
@@ -9,42 +8,29 @@ import rimrafJs = require('rimraf');
 import { promisify } from 'util';
 import chalk from 'chalk';
 import { TerseError } from '@alwaysai/alwayscli';
+import { PseudoCwd } from './pseudo-cwd';
 
 export type CommandSpec = {
   exe: string;
   args?: string[];
-  cwd?: string;
+  path?: string;
   input?: Readable;
 };
 
 export type RunCommand = (spec: CommandSpec) => Promise<string>;
 export type RunForeground = (spec: CommandSpec) => void;
 
-export function checkPathIsAbsolute(path?: string) {
-  if (path && !isAbsolute(path)) {
-    throw new Error('If provided, path must be absolute');
-  }
-}
+export type Spawner = ReturnType<typeof ChildSpawner>;
 
-export function ChildSpawner(config: { path: string }) {
-  checkPathIsAbsolute(config.path);
-
-  function toAbsolute(path?: string) {
-    if (typeof path === 'undefined') {
-      return config.path;
-    }
-
-    if (isAbsolute(path)) {
-      return path;
-    }
-
-    return join(config.path, path);
-  }
+export function ChildSpawner(context: { path?: string } = {}) {
+  const pseudoCwd = PseudoCwd(process.cwd());
+  pseudoCwd.cd(context.path);
+  const { toAbsolute, cwd } = pseudoCwd;
 
   const runCommand: RunCommand = (spec: CommandSpec) => {
-    const cwd = spec.cwd ? toAbsolute(spec.cwd) : undefined;
+    const path = spec.path ? toAbsolute(spec.path) : undefined;
     return new Promise((resolve, reject) => {
-      const child = spawn(spec.exe, spec.args || [], { cwd });
+      const child = spawn(spec.exe, spec.args || [], { cwd: path });
       signalExit(() => {
         child.kill();
       });
@@ -90,7 +76,7 @@ export function ChildSpawner(config: { path: string }) {
 
   const runForeground: RunForeground = (spec: CommandSpec) => {
     const out = spawnSync(spec.exe, spec.args || [], {
-      cwd: spec.cwd ? toAbsolute(spec.cwd) : undefined,
+      cwd: spec.path ? toAbsolute(spec.path) : undefined,
       stdio: 'inherit',
     });
     if (out.error) {
@@ -99,7 +85,7 @@ export function ChildSpawner(config: { path: string }) {
   };
 
   function shell() {
-    runForeground({ exe: '/bin/bash', args: ['--login'], cwd: config.path });
+    runForeground({ exe: '/bin/bash', args: ['--login'], path: context.path });
   }
 
   async function mkdirp(path?: string) {
@@ -111,13 +97,18 @@ export function ChildSpawner(config: { path: string }) {
   }
 
   // TODO: Use JS implementation
-  async function untar(input: Readable, cwd: string) {
-    await runCommand({ exe: 'tar', args: ['-xz'], cwd: toAbsolute(cwd), input });
+  async function untar(input: Readable, path?: string) {
+    await runCommand({
+      exe: 'tar',
+      args: ['-xz'],
+      path: toAbsolute(path),
+      input,
+    });
   }
 
   return {
-    path: config.path,
     toAbsolute,
+    cwd,
     mkdirp,
     rimraf,
     shell,
