@@ -1,98 +1,71 @@
-import { Readable } from 'stream';
-
-import {
-  ChildSpawner,
-  RunCommand,
-  RunForeground,
-  CommandSpec,
-  Spawner,
-} from './child-spawner';
-import { checkTerminalIsInteractive } from '../prompt';
-import { PseudoCwd } from './pseudo-cwd';
+import { Spawner, Cmd } from './types';
+import { SpawnerBase, spawnerBase } from './spawner-base';
+import { GnuSpawner } from './gnu-spawner';
+import { resolve } from 'path';
 
 const IMAGE_NAME = 'alwaysai/edgeiq';
-const DEFAULT_PATH = '/app';
+const APP_DIR = '/app';
 
-export function DockerSpawner(context: { path?: string } = {}) {
-  const childSpawner = ChildSpawner();
+export function DockerSpawner(): Spawner {
+  const gnuSpawner = GnuSpawner({ abs, ...SpawnerBase(translate) });
 
-  const pseudoCwd = PseudoCwd(DEFAULT_PATH);
-  pseudoCwd.cd(context.path);
+  return {
+    ...gnuSpawner,
+    shell,
+    rimraf(path?: string) {
+      if (abs(path || '') === abs()) {
+        throw new Error('Refusing to delete whole directory because it is mirrored');
+      }
+      return gnuSpawner.rimraf(path);
+    },
+  };
 
-  const { toAbsolute, cwd } = pseudoCwd;
+  function abs(...paths: string[]) {
+    return resolve(APP_DIR, ...paths);
+  }
 
-  // Workdir determines the user's current working directory in the container
-  const Workdir = (path?: string) => ['--workdir', toAbsolute(path)];
-
-  // Mount a filesystem volume in the container https://docs.docker.com/storage/volumes/
-  const Volume = () => ['--volume', `${process.cwd()}:${cwd()}`];
-
-  function translateSpec(spec: CommandSpec) {
-    const args = ['run', '--interactive', ...Volume()];
-    if (spec.path) {
-      args.push(...Workdir(spec.path));
+  function translate(cmd: Cmd) {
+    const args = ['run', '--interactive', ...VolumeArgs()];
+    if (cmd.cwd) {
+      args.push(...WorkdirArgs(cmd.cwd));
     }
-    args.push(IMAGE_NAME, spec.exe);
+    args.push(IMAGE_NAME, cmd.exe);
 
-    if (spec.args) {
-      args.push(...spec.args);
+    if (cmd.args) {
+      args.push(...cmd.args);
     }
 
-    const translated: CommandSpec = {
+    const translated: Cmd = {
       exe: 'docker',
       args,
-      input: spec.input,
+      input: cmd.input,
     };
 
     return translated;
   }
 
-  const runCommand: RunCommand = spec => {
-    return childSpawner.runCommand(translateSpec(spec));
-  };
+  // Mount a filesystem volume in the container https://docs.docker.com/storage/volumes/
+  function VolumeArgs() {
+    return ['--volume', `${process.cwd()}:${abs()}`];
+  }
 
-  const runForeground: RunForeground = spec => {
-    return childSpawner.runForeground(translateSpec(spec));
-  };
+  // Workdir determines the user's current working directory in the container
+  function WorkdirArgs(path = '') {
+    return ['--workdir', abs(path)];
+  }
 
   function shell() {
-    checkTerminalIsInteractive();
-    childSpawner.runForeground({
+    spawnerBase.runForeground({
       exe: 'docker',
       args: [
         'run',
         '--tty',
         '--interactive',
-        ...Volume(),
-        ...Workdir(context.path),
+        ...VolumeArgs(),
+        ...WorkdirArgs(),
         IMAGE_NAME,
         '/bin/bash',
       ],
     });
   }
-
-  async function mkdirp(path?: string) {
-    await runCommand({ exe: 'mkdir', args: ['-p', toAbsolute(path)] });
-  }
-
-  async function rimraf(path?: string) {
-    await runCommand({ exe: 'rm', args: ['-rf', toAbsolute(path)] });
-  }
-
-  async function untar(input: Readable, path?: string) {
-    await runCommand({ exe: 'tar', args: ['-xz'], path: toAbsolute(path), input });
-  }
-
-  const spawner: Spawner = {
-    toAbsolute,
-    cwd,
-    mkdirp,
-    rimraf,
-    untar,
-    shell,
-    runCommand,
-    runForeground,
-  };
-
-  return spawner;
 }

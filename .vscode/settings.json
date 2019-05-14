@@ -5,6 +5,7 @@
     "deserialize",
     "stream",
     "tarbomb",
+    "untar",
     "workdir"
   ],
   "tslint.enable": true

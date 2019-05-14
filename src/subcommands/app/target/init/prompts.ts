@@ -60,7 +60,7 @@ export async function promptForHostname(initialValue: string, yes: boolean) {
   let connected = false;
   try {
     const spawner = SshSpawner({ hostname, path: '/tmp' });
-    await spinOnPromise(spawner.runCommand({ exe: 'ls' }), 'Test connection');
+    await spinOnPromise(spawner.run({ exe: 'ls' }), 'Test connection');
     connected = true;
   } catch (ex) {
     await promptToConfirmSave(

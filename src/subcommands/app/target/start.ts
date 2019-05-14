@@ -19,6 +19,6 @@ export const start = createLeaf({
     if (fullExe === 'python' || fullExe === 'python3') {
       fullExe = `venv/bin/${fullExe}`;
     }
-    spawner.runForeground({ exe, args, path: spawner.cwd() });
+    spawner.runForeground({ exe, args, cwd: spawner.abs() });
   },
 });

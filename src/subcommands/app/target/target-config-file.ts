@@ -21,15 +21,9 @@ const sshTarget = t.type(
   'SshTarget',
 );
 
-const dockerTargetRequired = t.type({
+const dockerTarget = t.type({
   protocol: t.literal(TargetProtocol['docker:']),
 });
-
-const dockerTargetOptional = t.partial({
-  path: t.string,
-});
-
-const dockerTarget = t.intersection([dockerTargetRequired, dockerTargetOptional]);
 
 const targetConfigCodec = t.taggedUnion('protocol', [sshTarget, dockerTarget]);
 export type TargetConfig = t.TypeOf<typeof targetConfigCodec>;
@@ -82,7 +76,7 @@ function TargetConfigFile(dir = process.cwd()) {
         const sshSpawner = SshSpawner({ path: config.path, hostname: config.hostname });
         return sshSpawner;
       case 'docker:':
-        return DockerSpawner({ path: config.path });
+        return DockerSpawner();
       default:
         throw new TerseError('Unsupported protocol');
     }

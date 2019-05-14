@@ -3,9 +3,11 @@ import { join, dirname } from 'path';
 import { promisify } from 'util';
 import { homedir } from 'os';
 import { Readable } from 'stream';
+
 import LogSymbols = require('log-symbols');
 import rimraf = require('rimraf');
 import download = require('download');
+import difference = require('lodash.difference');
 
 import { createLeaf } from '@alwaysai/alwayscli';
 
@@ -13,44 +15,49 @@ import { ModelId } from '../../../model-id';
 import { createRpcClient } from '../../../create-rpc-client';
 import { appConfigFile, AppConfig } from '../../../app-config-file';
 import { targetConfigFile } from './target-config-file';
-import { createTarbombStream } from '../../../create-tarbomb-stream';
 import { MODEL_CONFIG_FILE_NAME } from '../../model/model-config-file';
 import { spinOnPromise } from '../../../spin-on-promise';
-import { Spawner } from '../../../spawner/child-spawner';
+import { JsSpawner } from '../../../spawner/js-spawner';
+import { getRandomString } from '../../../get-random-string';
+import { Spawner } from '../../../spawner/types';
 
 const rimrafAsync = promisify(rimraf);
 const DOT_ALWAYSAI_DIR = join(homedir(), '.alwaysai');
 const MODEL_PACKAGE_CACHE_DIR = join(DOT_ALWAYSAI_DIR, 'model-package-cache');
 const REQUIREMENTS_FILE_NAME = 'requirements.txt';
 const VENV_ROOT = 'venv';
+const IGNORED_FILE_NAMES = ['models', 'node_modules', '.git'];
 
 export const install = createLeaf({
   name: 'install',
   description: 'Install this application and its dependencies to the target',
   async action() {
     const appConfig = appConfigFile.read();
-    const spawner = targetConfigFile.readSpawner();
+    const target = targetConfigFile.readSpawner();
     const targetConfig = targetConfigFile.read();
-    await spawner.mkdirp('.');
+    const source = JsSpawner();
+    await target.mkdirp();
 
     if (targetConfig.protocol === 'ssh:') {
-      await spinOnPromise(
-        spawner.untar(createTarbombStream(process.cwd())),
-        'Application code',
-      );
+      async function copyApplicationCode() {
+        const allFileNames = await source.readdir();
+        const filteredFileNames = difference(allFileNames, IGNORED_FILE_NAMES);
+        const readable = await source.tar(...filteredFileNames);
+        await target.untar(readable);
+      }
+      await spinOnPromise(copyApplicationCode(), 'Transfer application');
     } else {
-      // protocol == 'docker:' has the volume mounted so nothing to do here
       console.log(`${LogSymbols.success} Application code`);
     }
 
-    await installModels(spawner, appConfig.models);
+    await installModels(target, appConfig.models);
 
     try {
       await spinOnPromise(
-        spawner.runCommand({
+        target.run({
           exe: 'virtualenv',
           args: ['--system-site-packages', VENV_ROOT],
-          path: '.',
+          cwd: '.',
         }),
         'Python virtualenv',
       );
@@ -62,10 +69,10 @@ export const install = createLeaf({
 
     if (existsSync(REQUIREMENTS_FILE_NAME)) {
       await spinOnPromise(
-        spawner.runCommand({
+        target.run({
           exe: `${VENV_ROOT}/bin/pip`,
           args: ['install', '-r', REQUIREMENTS_FILE_NAME],
-          path: '.',
+          cwd: '.',
         }),
         'Python dependencies',
       );
@@ -75,7 +82,7 @@ export const install = createLeaf({
   },
 });
 
-async function installModels(spawner: Spawner, models: AppConfig['models']) {
+async function installModels(target: Spawner, models: AppConfig['models']) {
   if (!models || Object.keys(models).length === 0) {
     console.log(`${LogSymbols.success} No models to install.`);
     return;
@@ -84,13 +91,13 @@ async function installModels(spawner: Spawner, models: AppConfig['models']) {
   async function installOneModel(id: string, version: string) {
     const returnValue = { changed: false };
     const { publisher, name } = ModelId.parse(id);
-    const modelDir = spawner.toAbsolute(`models/@${publisher}/${name}`);
+    const modelDir = `models/@${publisher}/${name}`;
     let installedVersion: string | undefined = undefined;
     try {
-      const output = await spawner.runCommand({
+      const output = await target.run({
         exe: 'cat',
         args: [`${modelDir}/${MODEL_CONFIG_FILE_NAME}`],
-        path: '.',
+        cwd: '.',
       });
       const parsed = JSON.parse(output);
       installedVersion = parsed.version;
@@ -132,19 +139,21 @@ async function installModels(spawner: Spawner, models: AppConfig['models']) {
         await rimrafAsync(downloadFilePath);
       }
     }
-    const tmpId = Math.random()
-      .toString(36)
-      .substring(2);
-    const tmpDir = spawner.toAbsolute(`tmp/${tmpId}`);
-    await spawner.mkdirp(tmpDir);
-    await spawner.untar(modelPackageStream, tmpDir);
-    const output = await spawner.runCommand({ exe: 'ls', path: tmpDir });
-    const fileName = output.trim();
-    await spawner.rimraf(modelDir);
-    await spawner.mkdirp(dirname(modelDir));
-    await spawner.runCommand({
+    const tmpId = getRandomString();
+    const tmpDir = `tmp/${tmpId}`;
+    await target.mkdirp(tmpDir);
+    await target.untar(modelPackageStream, tmpDir);
+    const fileNames = await target.readdir(tmpDir);
+    const fileName = fileNames[0];
+    if (!fileName) {
+      throw new Error('Expected package to contain a directory');
+    }
+    await target.rimraf(modelDir);
+    await target.mkdirp(dirname(modelDir));
+    await target.run({
       exe: 'mv',
       args: [join(tmpDir, fileName), modelDir],
+      cwd: '.',
     });
     return returnValue;
   } // End of install one
