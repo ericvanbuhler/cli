@@ -30,6 +30,10 @@ type NamedInputs = Parameters<typeof init.action>[1];
 async function runYesInterface({ yes, ...passed }: NamedInputs) {
   const { protocol } = passed;
   switch (protocol) {
+    case undefined: {
+      throw new UsageError('--protocol is required with --yes');
+    }
+
     case TargetProtocol['docker:']: {
       for (const optionName of ['hostname' as const, 'path' as const]) {
         if (passed[optionName]) {
