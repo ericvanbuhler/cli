@@ -8,6 +8,8 @@ import { checkTerminalIsInteractive } from '../../prompt';
 
 type Config = Parameters<typeof modelConfigFile.write>[0];
 
+const ALREADY_EXISTS_MESSAGE = "You're already in an alwaysAI model directory!";
+
 export const init = createLeaf({
   name: 'init',
   description: 'Initialize this directory as an alwaysAI model',
@@ -20,7 +22,11 @@ export const init = createLeaf({
     }
 
     if (modelConfigFile.exists()) {
-      throw new TerseError("You're already in an alwaysAI model directory!");
+      if (!yes) {
+        throw new TerseError(ALREADY_EXISTS_MESSAGE);
+      } else {
+        return ALREADY_EXISTS_MESSAGE;
+      }
     }
 
     console.log(
@@ -29,18 +35,16 @@ export const init = createLeaf({
     console.log();
 
     const defaultConfig: Config = {
-      publisher: 'alwaysai',
-      name: basename(process.cwd()),
+      id: `alwaysai/${basename(process.cwd())}`,
       version: '0.0.0-0',
       accuracy: '',
       description: '',
       license: 'UNLICENSED',
       public: true,
-      packageUrl: '',
-      uuid: '',
+      purpose: 'Classification',
     };
 
     modelConfigFile.write(defaultConfig);
-    console.log(`Wrote ${basename(modelConfigFile.path)}`);
+    return `Wrote ${basename(modelConfigFile.path)}`;
   },
 });

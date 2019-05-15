@@ -1,6 +1,5 @@
 import { createLeaf } from '@alwaysai/alwayscli';
 
-import { ModelId } from '../../model-id';
 import { createRpcClient } from '../../create-rpc-client';
 
 export const list = createLeaf({
@@ -8,7 +7,8 @@ export const list = createLeaf({
   description: 'List alwaysAI models',
   async action() {
     const rpcClient = createRpcClient();
-    const models = await rpcClient.listModelVersions();
-    return models.map(model => ModelId.serialize(model)).join('\n');
+    const modelVersions = await rpcClient.listModelVersions();
+    const uniqueIds = [...new Set(modelVersions.map(({ id }) => id))];
+    return uniqueIds.join('\n');
   },
 });

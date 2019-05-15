@@ -1,14 +1,57 @@
-import { createLeaf } from '@alwaysai/alwayscli';
+import { S3 } from 'aws-sdk';
 
+import { createLeaf } from '@alwaysai/alwayscli';
 import { modelConfigFile } from './model-config-file';
 import { createRpcClient } from '../../create-rpc-client';
+import { parsePackageUrl } from '../../model-manager/parse-package-url';
+import { PackageStreamFromCache } from '../../model-manager/package-stream-from-cache';
+import { PackageStreamFromCwd } from '../../model-manager/package-stream-from-cwd';
+import { streamPackageToCache } from '../../model-manager/stream-package-to-cache';
+import { spinOnPromise } from '../../spin-on-promise';
 
 export const publish = createLeaf({
   name: 'publish',
   description: 'Publish a new version of a model to the alwaysAI cloud',
   async action() {
     const config = modelConfigFile.read();
-    const rpcClient = createRpcClient();
-    await rpcClient.createModelVersion(config);
+
+    // Create the provisional record in the database and get packageUrl
+    const rpcApi = createRpcClient();
+    const modelVersion = await rpcApi.createModelVersion(config);
+    await spinOnPromise(
+      (async () => {
+        const cwdPackageStream = await PackageStreamFromCwd();
+        await streamPackageToCache({
+          id: config.id,
+          version: config.version,
+          readable: cwdPackageStream,
+        });
+      })(),
+      'Create package',
+    );
+
+    await spinOnPromise(
+      (async () => {
+        const { awsRegion, bucketName, bucketKey } = parsePackageUrl(
+          modelVersion.packageUrl,
+        );
+        const s3 = new S3({ apiVersion: '2006-03-01', region: awsRegion });
+        const readStream = await PackageStreamFromCache({
+          id: config.id,
+          version: config.version,
+        });
+        await s3
+          .upload({ Bucket: bucketName, Body: readStream, Key: bucketKey })
+          .promise();
+      })(),
+      'Upload to cloud',
+    );
+
+    await spinOnPromise(
+      (async () => {
+        await rpcApi.finalizeModelVersion(modelVersion.uuid as any);
+      })(),
+      'Mark package as final',
+    );
   },
 });

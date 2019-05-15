@@ -6,21 +6,24 @@ export type ModelId = {
 };
 
 export const ModelId = {
-  parse(modelId: string) {
-    const errorMessage = `Expected model ID to be of the form "@publisher/modelName"`;
-    if (modelId.charAt(0) !== '@') {
-      throw new TerseError(errorMessage);
-    }
-    const splits = modelId.split('/');
+  parse(id: string) {
+    const errorMessage = `Expected model ID to be of the form "publisher/name"`;
+    const splits = id.split('/');
     if (splits.length !== 2) {
       throw new TerseError(errorMessage);
     }
+    for (const split of splits) {
+      if (!split) {
+        throw new TerseError(errorMessage);
+      }
+      // TODO: Check for valid chars
+    }
     return {
-      publisher: splits[0].slice(1),
+      publisher: splits[0],
       name: splits[1],
     };
   },
   serialize({ publisher, name }: ModelId) {
-    return `@${publisher}/${name}`;
+    return `${publisher}/${name}`;
   },
 };

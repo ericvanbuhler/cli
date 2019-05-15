@@ -20,7 +20,9 @@
       "name": "CLI",
       "program": "${workspaceFolder}/node_modules/.bin/ts-node",
       "args": [
-        "src/index.ts"
+        "src",
+        "model",
+        "publish"
       ],
     },
   ]

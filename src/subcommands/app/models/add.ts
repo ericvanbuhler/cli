@@ -2,7 +2,6 @@ import { createLeaf, TerseError } from '@alwaysai/alwayscli';
 import { ErrorCode } from '@alwaysai/cloud-api';
 
 import { appConfigFile } from '../../../app-config-file';
-import { ModelId } from '../../../model-id';
 import { ids } from '../../../inputs/ids';
 import { createRpcClient } from '../../../create-rpc-client';
 import { spinOnPromise } from '../../../spin-on-promise';
@@ -16,10 +15,9 @@ export const addModels = createLeaf({
     const rpcClient = createRpcClient();
     const checked: [string, string][] = [];
     for (const id of ids) {
-      const { publisher, name } = ModelId.parse(id);
       try {
         const { version } = await spinOnPromise(
-          rpcClient.getModelVersion({ name, publisher }),
+          rpcClient.getModelVersion({ id }),
           `Checking model "${id}"`,
         );
         checked.push([id, version]);
