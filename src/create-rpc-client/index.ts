@@ -13,10 +13,8 @@ switch (readSystemId()) {
     cloudApiUrl = 'http://localhost:8000';
     break;
   case 'development':
-    cloudApiUrl = 'http://cloud-api-586812470.us-west-2.elb.amazonaws.com/';
-    break;
   case 'production':
-    cloudApiUrl = 'https://alwaysai.appspot.com';
+    cloudApiUrl = 'http://cloud-api-586812470.us-west-2.elb.amazonaws.com/';
     break;
   default:
     throw new Error('Unsupported systemId');
