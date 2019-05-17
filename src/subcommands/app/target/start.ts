@@ -2,23 +2,51 @@ import { createLeaf, TerseError } from '@alwaysai/alwayscli';
 
 import { appConfigFile } from '../../../app-config-file';
 import { targetConfigFile } from './target-config-file';
+import { VENV } from '../../../app-installer';
+import { spawnerBase } from '../../../spawner/spawner-base';
+import { join } from 'path';
 
-export const start = createLeaf({
+export const appTargetStart = createLeaf({
   name: 'start',
-  description: 'Run the application "start" script in the dev target',
   options: {},
+  description: 'Run this application "start" script on the target',
   action() {
     const appConfig = appConfigFile.read();
     const script = appConfig.scripts && appConfig.scripts.start;
     if (!script) {
       throw new TerseError('This application does not define a "start" script');
     }
-    const [exe, ...args] = script.split(' ');
     const spawner = targetConfigFile.readSpawner();
-    let fullExe = exe;
-    if (fullExe === 'python' || fullExe === 'python3') {
-      fullExe = `venv/bin/${fullExe}`;
+    const targetConfig = targetConfigFile.read();
+
+    switch (targetConfig.protocol) {
+      case 'docker:': {
+        spawner.runForeground({
+          exe: '/bin/bash',
+          args: ['-t', '-c', `source ${join(VENV, 'bin', 'activate')} && ${script}`],
+          tty: true,
+          cwd: '.',
+        });
+        return;
+      }
+
+      case 'ssh:': {
+        const command = `cd ${spawner.abs()} && source ${join(
+          VENV,
+          'bin',
+          'activate',
+        )} && ${script}`;
+
+        spawnerBase.runForeground({
+          exe: 'ssh',
+          args: ['-t', targetConfig.hostname, command],
+        });
+        return;
+      }
+
+      default: {
+        throw new Error('Unsupported protocol');
+      }
     }
-    spawner.runForeground({ exe, args, cwd: spawner.abs() });
   },
 });

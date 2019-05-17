@@ -1,7 +1,7 @@
 import { createLeaf } from '@alwaysai/alwayscli';
 import { appConfigFile } from '../../../app-config-file';
-import { fakeSpinner } from '../../../fake-spinner';
 import { ids } from '../../../inputs/ids';
+import logSymbols = require('log-symbols');
 
 export const removeModels = createLeaf({
   name: 'remove',
@@ -11,9 +11,8 @@ export const removeModels = createLeaf({
   async action(ids) {
     appConfigFile.read();
     for (const id of ids) {
-      await fakeSpinner(`Removing model "${id}"`);
       appConfigFile.removeModel(id);
+      console.log(`${logSymbols.success} Remove ${id}`);
     }
-    console.log('Done!');
   },
 });

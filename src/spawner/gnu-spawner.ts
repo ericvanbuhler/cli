@@ -20,14 +20,10 @@ export function GnuSpawner(context: {
     readdir,
     mkdirp,
     rimraf,
-    shell,
     tar,
     untar,
+    exists,
   };
-
-  function shell() {
-    runForeground({ exe: '/bin/bash', args: ['--login'], cwd: abs() });
-  }
 
   async function mkdirp(path?: string) {
     await run({ exe: 'mkdir', args: ['-p', abs(path || '')] });
@@ -74,5 +70,17 @@ export function GnuSpawner(context: {
       cwd: abs(cwd),
       input,
     });
+  }
+
+  async function exists(path: string) {
+    if (!path) {
+      throw new Error('"path" is required');
+    }
+    try {
+      await run({ exe: 'stat', args: [abs(path)] });
+      return true;
+    } catch (ex) {
+      return false;
+    }
   }
 }

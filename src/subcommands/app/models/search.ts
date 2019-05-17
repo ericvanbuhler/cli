@@ -1,13 +1,10 @@
 import { createLeaf } from '@alwaysai/alwayscli';
+import { createRpcClient } from '../../../create-rpc-client';
 
-import { createRpcClient } from '../../create-rpc-client';
-import chalk from 'chalk';
-
-export const list = createLeaf({
-  name: 'list',
-  description: 'List alwaysAI models',
+export const searchModels = createLeaf({
+  name: 'search',
+  description: 'Search alwaysAI models',
   async action() {
-    console.error(`${chalk.red('WARNING:')} This command is deprecated`);
     const rpcClient = createRpcClient();
     const modelVersions = await rpcClient.listModelVersions();
     const uniqueIds = [...new Set(modelVersions.map(({ id }) => id))];

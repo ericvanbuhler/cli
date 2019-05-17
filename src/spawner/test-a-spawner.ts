@@ -8,17 +8,6 @@ type SpawnerFactory<T extends any[]> = (...args: T) => Spawner;
 export function testASpawner<T extends any[]>(factory: SpawnerFactory<T>, ...args: T) {
   const spawner = factory(...args);
   const { abs, mkdirp, rimraf, run, readdir, runForeground, tar, untar } = spawner;
-  async function exists(path?: string) {
-    try {
-      await readdir(path);
-    } catch (ex) {
-      if (ex.code === 'ENOENT') {
-        return false;
-      }
-      throw ex;
-    }
-    return true;
-  }
 
   describe(factory.name, () => {
     describe(abs.name, () => {
@@ -47,21 +36,21 @@ export function testASpawner<T extends any[]>(factory: SpawnerFactory<T>, ...arg
     describe(mkdirp.name, () => {
       it('makes the context path directory if no args are provided', async () => {
         await spawner.mkdirp();
-        expect(await exists(abs())).toBe(true);
+        expect(await spawner.exists(abs())).toBe(true);
       });
 
       it('makes a context-path-relative directory if one is provided', async () => {
         const tmpId = getRandomString();
         await spawner.mkdirp(tmpId);
-        expect(await exists(join(abs(), tmpId))).toBe(true);
+        expect(await spawner.exists(join(abs(), tmpId))).toBe(true);
       });
 
       it('makes an absolute path if one is provided', async () => {
         const tmpId = getRandomString();
         const tmpDir = abs(tmpId);
-        expect(await exists(tmpDir)).toBe(false);
+        expect(await spawner.exists(tmpDir)).toBe(false);
         await spawner.mkdirp(tmpDir);
-        expect(await exists(tmpDir)).toBe(true);
+        expect(await spawner.exists(tmpDir)).toBe(true);
       });
     });
 
@@ -69,17 +58,17 @@ export function testASpawner<T extends any[]>(factory: SpawnerFactory<T>, ...arg
       it('removes an abs-relative directory if one is provided', async () => {
         const tmpId = getRandomString();
         await spawner.mkdirp(tmpId);
-        expect(await exists(join(abs(), tmpId))).toBe(true);
+        expect(await spawner.exists(join(abs(), tmpId))).toBe(true);
         await spawner.rimraf(tmpId);
-        expect(await exists(join(abs(), tmpId))).toBe(false);
+        expect(await spawner.exists(join(abs(), tmpId))).toBe(false);
       });
 
       it('removes an absolute path if one is provided', async () => {
         const tmpId = getRandomString();
         const tmpDir = abs(tmpId);
-        expect(await exists(tmpDir)).toBe(false);
+        expect(await spawner.exists(tmpDir)).toBe(false);
         await spawner.mkdirp(tmpDir);
-        expect(await exists(tmpDir)).toBe(true);
+        expect(await spawner.exists(tmpDir)).toBe(true);
       });
     });
 

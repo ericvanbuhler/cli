@@ -2,27 +2,19 @@ import LogSymbols = require('log-symbols');
 
 import { createLeaf } from '@alwaysai/alwayscli';
 
-import { appConfigFile } from '../../../app-config-file';
-import { targetConfigFile } from './target-config-file';
-import { spinOnPromise } from '../../../spin-on-promise';
-import { JsSpawner } from '../../../spawner/js-spawner';
-import { AppInstaller } from '../../../app-installer';
+import { appConfigFile } from '../../app-config-file';
+import { spinOnPromise } from '../../spin-on-promise';
+import { JsSpawner } from '../../spawner/js-spawner';
+import { AppInstaller } from '../../app-installer';
 
-export const install = createLeaf({
+export const appInstall = createLeaf({
   name: 'install',
-  description: 'Install this application and its dependencies to the target',
+  hidden: true,
+  description: "Install this application's dependencies",
   async action() {
     const appConfig = appConfigFile.read();
-    const target = targetConfigFile.readSpawner();
-    const targetConfig = targetConfigFile.read();
-    const source = JsSpawner();
-    await target.mkdirp();
-
+    const target = JsSpawner();
     const appInstaller = AppInstaller(target);
-
-    if (targetConfig.protocol === 'ssh:') {
-      await spinOnPromise(appInstaller.installSource(source), 'Application source');
-    }
 
     let hasModels = false;
     if (appConfig.models) {

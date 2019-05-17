@@ -4,12 +4,7 @@ import { GnuSpawner } from './gnu-spawner';
 import { resolve } from 'path';
 
 export function ChildSpawner(context: { path?: string } = {}) {
-  const gnuSpawner = GnuSpawner({ abs, ...SpawnerBase(translate) });
-
-  return {
-    ...gnuSpawner,
-    shell,
-  };
+  return GnuSpawner({ abs, ...SpawnerBase(translate) });
 
   function abs(...paths: string[]) {
     return resolve(context.path || '', ...paths);
@@ -22,9 +17,5 @@ export function ChildSpawner(context: { path?: string } = {}) {
     }
 
     return translated;
-  }
-
-  function shell() {
-    gnuSpawner.runForeground({ exe: 'exec $SHELL -l', cwd: '.' });
   }
 }

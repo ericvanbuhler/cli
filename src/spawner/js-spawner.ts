@@ -1,4 +1,4 @@
-import { readdir as fsReaddir } from 'fs';
+import { readdir as fsReaddir, access } from 'fs';
 
 import { Readable } from 'stream';
 import { promisify } from 'util';
@@ -21,6 +21,7 @@ export function JsSpawner(context: { path?: string } = {}): Spawner {
     mkdirp,
     rimraf,
     tar,
+    exists,
   };
 
   function abs(...paths: string[]) {
@@ -63,5 +64,17 @@ export function JsSpawner(context: { path?: string } = {}): Spawner {
     ) as unknown) as Readable;
     // ^^ The @types for tar.create are not correct
     return packageStream;
+  }
+
+  async function exists(path: string) {
+    if (!path) {
+      throw new Error('path is mandatory');
+    }
+    try {
+      await promisify(access)(abs(path));
+      return true;
+    } catch (ex) {
+      return false;
+    }
   }
 }

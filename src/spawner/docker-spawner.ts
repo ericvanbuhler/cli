@@ -1,5 +1,5 @@
 import { Spawner, Cmd } from './types';
-import { SpawnerBase, spawnerBase } from './spawner-base';
+import { SpawnerBase } from './spawner-base';
 import { GnuSpawner } from './gnu-spawner';
 import { resolve } from 'path';
 
@@ -11,7 +11,6 @@ export function DockerSpawner(): Spawner {
 
   return {
     ...gnuSpawner,
-    shell,
     rimraf(path?: string) {
       if (abs(path || '') === abs()) {
         throw new Error('Refusing to delete whole directory because it is mirrored');
@@ -26,6 +25,9 @@ export function DockerSpawner(): Spawner {
 
   function translate(cmd: Cmd) {
     const args = ['run', '--interactive', ...VolumeArgs()];
+    if (cmd.tty) {
+      args.push('--tty');
+    }
     if (cmd.cwd) {
       args.push(...WorkdirArgs(cmd.cwd));
     }
@@ -52,20 +54,5 @@ export function DockerSpawner(): Spawner {
   // Workdir determines the user's current working directory in the container
   function WorkdirArgs(path = '') {
     return ['--workdir', abs(path)];
-  }
-
-  function shell() {
-    spawnerBase.runForeground({
-      exe: 'docker',
-      args: [
-        'run',
-        '--tty',
-        '--interactive',
-        ...VolumeArgs(),
-        ...WorkdirArgs(),
-        IMAGE_NAME,
-        '/bin/bash',
-      ],
-    });
   }
 }
