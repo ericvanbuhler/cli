@@ -1,5 +1,3 @@
-import { S3 } from 'aws-sdk';
-
 import { createLeaf } from '@alwaysai/alwayscli';
 import { modelConfigFile } from './model-config-file';
 import { createRpcClient } from '../../create-rpc-client';
@@ -8,6 +6,7 @@ import { PackageStreamFromCache } from '../../model-manager/package-stream-from-
 import { PackageStreamFromCwd } from '../../model-manager/package-stream-from-cwd';
 import { streamPackageToCache } from '../../model-manager/stream-package-to-cache';
 import { spinOnPromise } from '../../spin-on-promise';
+import { S3 } from '../../aws-clients';
 
 export const publish = createLeaf({
   name: 'publish',
@@ -35,7 +34,7 @@ export const publish = createLeaf({
         const { awsRegion, bucketName, bucketKey } = parsePackageUrl(
           modelVersion.packageUrl,
         );
-        const s3 = new S3({ apiVersion: '2006-03-01', region: awsRegion });
+        const s3 = S3({ region: awsRegion });
         const readStream = await PackageStreamFromCache({
           id: config.id,
           version: config.version,
