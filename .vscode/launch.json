@@ -25,5 +25,14 @@
         "publish"
       ],
     },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "CURRENT FILE",
+      "program": "${workspaceFolder}/node_modules/.bin/ts-node",
+      "args": [
+        "${file}"
+      ],
+    },
   ]
 }

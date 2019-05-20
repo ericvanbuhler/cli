@@ -12,7 +12,7 @@ export const addModels = createLeaf({
   args: ids,
   async action(ids) {
     appConfigFile.read();
-    const rpcClient = createRpcClient();
+    const rpcClient = await createRpcClient();
     const checked: [string, string][] = [];
     for (const id of ids) {
       try {

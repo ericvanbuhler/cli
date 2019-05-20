@@ -15,7 +15,7 @@ import { S3 } from '../aws-clients';
 const rimrafAsync = promisify(rimraf);
 
 export async function downloadPackage(opts: { id: string; version: string }) {
-  const rpcApi = createRpcClient();
+  const rpcApi = await createRpcClient();
   const { packageUrl } = await rpcApi.getModelVersion(opts);
   const { awsRegion, bucketName, bucketKey } = parsePackageUrl(packageUrl);
   const s3 = S3({ region: awsRegion });

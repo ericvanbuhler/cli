@@ -15,7 +15,7 @@ export const publish = createLeaf({
     const config = modelConfigFile.read();
 
     // Create the provisional record in the database and get packageUrl
-    const rpcApi = createRpcClient();
+    const rpcApi = await createRpcClient();
     const modelVersion = await rpcApi.createModelVersion(config);
     await spinOnPromise(
       (async () => {

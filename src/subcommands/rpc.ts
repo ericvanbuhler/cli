@@ -1,6 +1,12 @@
-import { createLeaf, createJsonInput, createBranch } from '@alwaysai/alwayscli';
+import {
+  createLeaf,
+  createJsonInput,
+  createBranch,
+  TerseError,
+} from '@alwaysai/alwayscli';
 import { rpcMethodSpecs } from '@alwaysai/cloud-api';
 import { createRpcClient } from '../create-rpc-client';
+import { checkLoggedIn } from '../cognito-auth';
 
 const subcommands = Object.entries(rpcMethodSpecs).map(
   ([methodName, { description }]) => {
@@ -11,7 +17,12 @@ const subcommands = Object.entries(rpcMethodSpecs).map(
         args: createJsonInput({ description: 'Arguments as JSON array string' }),
       },
       async action(_, { args }) {
-        const rpcClient = createRpcClient();
+        try {
+          await checkLoggedIn();
+        } catch (e) {
+          throw new TerseError('Please run alwaysai user login');
+        }
+        const rpcClient = await createRpcClient();
         const method = (rpcClient as any)[methodName];
         const result = await method(...(args || []));
         return result;
