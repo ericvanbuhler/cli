@@ -3,8 +3,14 @@ import { SpawnerBase } from './spawner-base';
 import { GnuSpawner } from './gnu-spawner';
 import { resolve } from 'path';
 
+<<<<<<< HEAD
 export const IMAGE_NAME = 'alwaysai/edgeiq';
 export const APP_DIR = '/app';
+=======
+//const IMAGE_NAME = 'alwaysai/edgeiq';
+const IMAGE_NAME = 'sandbox';
+const APP_DIR = '/app';
+>>>>>>> Forward ports and enable networking on docker container
 
 export function DockerSpawner(): Spawner {
   const gnuSpawner = GnuSpawner({ abs, ...SpawnerBase(translate) });
@@ -33,6 +39,12 @@ export function DockerSpawner(): Spawner {
       `${process.cwd()}:${abs()}`,
     ];
     // ^^ --volume mounts the current working directory into the container
+    //args.push('--privileged')
+    //args.push('-v');
+    //args.push('/dev:/dev')
+    args.push('-p');
+    args.push('5000:5000');
+
     if (cmd.tty) {
       args.push('--tty');
     }

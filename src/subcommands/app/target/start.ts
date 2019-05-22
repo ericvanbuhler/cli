@@ -50,7 +50,7 @@ export const appTargetStart = createLeaf({
 
         spawnerBase.runForeground({
           exe: 'ssh',
-          args: ['-t', targetConfig.hostname, command],
+          args: ['-L 5000:0.0.0.0:5000', '-t', targetConfig.hostname, command],
         });
         return;
       }
