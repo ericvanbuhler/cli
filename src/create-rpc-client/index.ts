@@ -6,7 +6,7 @@ import { deserializeRpcResponse } from './deserialize-rpc-response';
 
 import { readSystemId } from '../cli-config-file';
 import { getAccessToken, checkLoggedIn } from '../cognito-auth';
-import { TerseError } from '@alwaysai/always-cli';
+import { TerseError } from '@alwaysai/alwayscli';
 
 let cloudApiUrl: string;
 switch (readSystemId()) {
