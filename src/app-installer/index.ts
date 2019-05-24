@@ -1,11 +1,11 @@
 import difference = require('lodash.difference');
 
-import { IGNORED_FILE_NAMES } from '../constants';
 import { Spawner } from '../spawner/types';
 import { InstallModels } from './install-models';
 
 const REQUIREMENTS_FILE_NAME = 'requirements.txt';
 export const VENV = 'venv';
+const IGNORED_FILE_NAMES = ['models', 'node_modules', '.git', 'venv'];
 
 export function AppInstaller(target: Spawner) {
   const installModels = InstallModels(target);

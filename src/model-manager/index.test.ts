@@ -14,7 +14,7 @@ describe(__dirname, () => {
     const id = `${getRandomString()}/${getRandomString()}`;
     const version = getRandomString();
     const cwd = __dirname;
-    const fromCwd = await PackageStreamFromCwd(cwd);
+    const fromCwd = await PackageStreamFromCwd({ cwd });
     await streamPackageToCache({ id, version, readable: fromCwd });
     const target = JsSpawner({ path: tempy.directory() });
     const fromCache = await PackageStreamFromCache({ id, version });
