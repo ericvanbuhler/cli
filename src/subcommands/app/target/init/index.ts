@@ -7,7 +7,12 @@ import { TargetProtocol } from '../../../../target-protocol';
 
 import { targetConfigFile } from '../target-config-file';
 import { options } from './options';
-import { promptForProtocol, promptForPath, promptForHostname } from './prompts';
+import {
+  promptForProtocol,
+  promptForPath,
+  promptForHostname,
+  checkForDocker,
+} from './prompts';
 
 export const init = createLeaf({
   name: 'init',
@@ -42,11 +47,23 @@ async function runYesInterface({ yes, ...passed }: NamedInputs) {
           );
         }
       }
+      await checkForDocker({ yes });
       return targetConfigFile.write({ protocol });
     }
 
     case TargetProtocol['ssh:']: {
       const { connected, hostname } = await promptForHostname(passed.hostname || '', yes);
+      const path = await promptForPath(passed.path || '', connected ? hostname : '', yes);
+      return targetConfigFile.write({
+        protocol,
+        hostname,
+        path,
+      });
+    }
+
+    case TargetProtocol['ssh+docker:']: {
+      const { connected, hostname } = await promptForHostname(passed.hostname || '', yes);
+      await checkForDocker({ hostname: passed.hostname, yes });
       const path = await promptForPath(passed.path || '', connected ? hostname : '', yes);
       return targetConfigFile.write({
         protocol,
@@ -91,12 +108,30 @@ async function runPromptedInterface({ yes, ...passed }: NamedInputs) {
   );
 
   switch (protocol) {
-    case 'docker:':
+    case 'docker:': {
       return targetConfigFile.write({ protocol });
-    case 'ssh:':
+    }
+    case 'ssh+docker:': {
       const { connected, hostname } = await promptForHostname(
         passed.hostname ||
-          (existing && existing.protocol === 'ssh:' && existing.hostname) ||
+          (existing && existing.protocol === protocol && existing.hostname) ||
+          '',
+        yes,
+      );
+      const path = await promptForPath(
+        passed.path ||
+          (existing && existing.protocol === protocol && existing.path) ||
+          '/',
+        connected ? hostname : undefined,
+        yes,
+      );
+      await checkForDocker({ hostname, yes });
+      return targetConfigFile.write({ protocol, hostname, path });
+    }
+    case 'ssh:': {
+      const { connected, hostname } = await promptForHostname(
+        passed.hostname ||
+          (existing && existing.protocol === protocol && existing.hostname) ||
           '',
         yes,
       );
@@ -106,7 +141,9 @@ async function runPromptedInterface({ yes, ...passed }: NamedInputs) {
         yes,
       );
       return targetConfigFile.write({ protocol, hostname, path });
-    default:
+    }
+    default: {
       throw new Error('Unexpected protocol');
+    }
   }
 }

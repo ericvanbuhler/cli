@@ -4,6 +4,7 @@ import keyMirror = require('keymirror');
 export const TargetProtocol = keyMirror({
   'ssh:': null,
   'docker:': null,
+  'ssh+docker:': null,
 });
 
 export type TargetProtocol = keyof typeof TargetProtocol;

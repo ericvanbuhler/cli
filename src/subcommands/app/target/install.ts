@@ -20,8 +20,12 @@ export const install = createLeaf({
 
     const appInstaller = AppInstaller(target);
 
-    if (targetConfig.protocol === 'ssh:') {
-      await spinOnPromise(appInstaller.installSource(source), 'Application source');
+    // Protocol-specific install steps
+    switch (targetConfig.protocol) {
+      case 'ssh:':
+      case 'ssh+docker:': {
+        await spinOnPromise(appInstaller.installSource(source), 'Application source');
+      }
     }
 
     let hasModels = false;

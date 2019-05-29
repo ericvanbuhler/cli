@@ -11,5 +11,6 @@ alwaysai app models add alwaysai/agenet
 
 ${DIR}/setup.sh
 ${DIR}/docker.sh
-${DIR}/local.sh
 ${DIR}/ssh.sh
+${DIR}/ssh-docker.sh
+${DIR}/local.sh

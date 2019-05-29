@@ -1,19 +1,41 @@
 import { Choice } from 'prompts';
-import chalk from 'chalk';
 
 import { TerseError, UsageError } from '@alwaysai/alwayscli';
 
 import { prompt, getNonInteractiveStreamName } from '../../../../prompt';
 import { TargetProtocol } from '../../../../target-protocol';
-import { spinOnPromise } from '../../../../spin-on-promise';
 import { SshSpawner } from '../../../../spawner/ssh-spawner';
+import { JsSpawner } from '../../../../spawner/js-spawner';
 
 import { validatePath, options } from './options';
+import logSymbols = require('log-symbols');
+import ora = require('ora');
+
+export async function checkForDocker(
+  opts: Partial<{ hostname: string; yes: boolean }> = {},
+) {
+  const spawner = opts.hostname
+    ? SshSpawner({ hostname: opts.hostname, path: '/tmp' })
+    : JsSpawner();
+  const spinner = ora('Check for "docker" executable');
+  try {
+    await spawner.run({ exe: 'docker', args: ['--version'] });
+    spinner.succeed();
+  } catch (ex) {
+    spinner.fail('Command "docker --version" failed.');
+    console.log(ex.message);
+    await promptToConfirmSave(opts.yes || false);
+  }
+}
 
 export async function promptForProtocol(initialProtocol: TargetProtocol) {
   const choices: Choice[] = [
-    { title: 'In a docker container on this host', value: TargetProtocol['docker:'] },
     { title: 'On a remote host accessible via ssh', value: TargetProtocol['ssh:'] },
+    { title: 'In a docker container on this host', value: TargetProtocol['docker:'] },
+    {
+      title: 'In a docker container on a remote host accessible via ssh',
+      value: TargetProtocol['ssh+docker:'],
+    },
   ];
 
   const initial = choices.findIndex(choice => choice.value === initialProtocol);
@@ -58,15 +80,18 @@ export async function promptForHostname(initialValue: string, yes: boolean) {
     ({ hostname } = answer);
   }
   let connected = false;
+  const spinner = ora('Check connectivity');
   try {
     const spawner = SshSpawner({ hostname, path: '/tmp' });
-    await spinOnPromise(spawner.run({ exe: 'ls' }), 'Test connection');
+    await spawner.run({ exe: 'ls' });
     connected = true;
+    spinner.succeed();
   } catch (ex) {
-    await promptToConfirmSave(
-      `${chalk.red('Error:')} ${ex.message || 'Could not connect'}`,
-      yes,
-    );
+    spinner.fail('Connection to target host failed');
+    if (ex.message) {
+      console.log(ex.message);
+    }
+    await promptToConfirmSave(yes);
   }
   return { connected, hostname };
 }
@@ -97,44 +122,47 @@ export async function promptForPath(
   }
 
   if (hostname) {
+    const spinner = ora('Check filesystem permissions');
     try {
       const spawner = SshSpawner({ hostname, path });
-      await spinOnPromise(spawner.mkdirp(), 'Create directory');
+      await spawner.mkdirp();
+      spinner.succeed();
     } catch (ex) {
-      await promptToConfirmSave(
-        `${chalk.red('Error:')} ${ex.message || 'Could not create directory'}`,
-        yes,
-      );
+      spinner.fail('Failed to create application directory on target system');
+      if (ex.message) {
+        console.log(ex.message);
+      }
+      await promptToConfirmSave(yes);
     }
   }
 
   return path;
 }
 
-export async function promptToConfirmSave(errorMessage: string, yes: boolean) {
+async function promptToConfirmSave(yes: boolean) {
+  if (yes) {
+    console.log(
+      logSymbols.warning,
+      "We'll save this configuration despite failed checks because --yes was passed",
+    );
+    return;
+  }
   if (getNonInteractiveStreamName()) {
-    if (!yes) {
-      // !interactive && !yes
-      throw new TerseError(errorMessage);
-    } else {
-      // !interactive && yes
-    }
-  } else {
-    if (yes) {
-      // interactive && yes
-    } else {
-      // interactive && !yes
-      const answers = await prompt([
-        {
-          type: 'confirm',
-          name: 'confirmed',
-          message: 'Do you want to save this configuration?',
-          initial: false,
-        },
-      ]);
-      if (!answers.confirmed) {
-        throw new Error('Operation canceled by user');
-      }
-    }
+    throw new TerseError(
+      'The above error is fatal because this terminal is not interactive nor was "--yes" passed as a command-line option.',
+    );
+  }
+
+  const answers = await prompt([
+    {
+      type: 'confirm',
+      name: 'confirmed',
+      message: 'Do you want to save this configuration?',
+      initial: false,
+    },
+  ]);
+
+  if (!answers.confirmed) {
+    throw new TerseError('Operation canceled by user');
   }
 }

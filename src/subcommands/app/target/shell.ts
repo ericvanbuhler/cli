@@ -28,6 +28,16 @@ export const shell = createLeaf({
         break;
       }
 
+      case 'ssh+docker:': {
+        target.runForeground({
+          exe: '/bin/bash',
+          args: ['--rcfile', rcfile],
+          tty: true,
+          cwd: '.',
+        });
+        break;
+      }
+
       default: {
         throw new Error('Unsupported protocol');
       }

@@ -30,6 +30,17 @@ export const appTargetStart = createLeaf({
         return;
       }
 
+      // This case differs from "docker:"" only in the extra single quotes around the command
+      case 'ssh+docker:': {
+        spawner.runForeground({
+          exe: '/bin/bash',
+          args: ['-t', '-c', `'source ${join(VENV, 'bin', 'activate')} && ${script}'`],
+          tty: true,
+          cwd: '.',
+        });
+        return;
+      }
+
       case 'ssh:': {
         const command = `cd ${spawner.abs()} && source ${join(
           VENV,

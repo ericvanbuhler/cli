@@ -3,8 +3,8 @@ import { SpawnerBase } from './spawner-base';
 import { GnuSpawner } from './gnu-spawner';
 import { resolve } from 'path';
 
-const IMAGE_NAME = 'alwaysai/edgeiq';
-const APP_DIR = '/app';
+export const IMAGE_NAME = 'alwaysai/edgeiq';
+export const APP_DIR = '/app';
 
 export function DockerSpawner(): Spawner {
   const gnuSpawner = GnuSpawner({ abs, ...SpawnerBase(translate) });
@@ -24,12 +24,20 @@ export function DockerSpawner(): Spawner {
   }
 
   function translate(cmd: Cmd) {
-    const args = ['run', '--interactive', ...VolumeArgs()];
+    const args = [
+      'run',
+      '--rm',
+      '--interactive',
+      '--volume',
+      `${process.cwd()}:${abs()}`,
+    ];
+    // ^^ --volume mounts the current working directory into the container
     if (cmd.tty) {
       args.push('--tty');
     }
     if (cmd.cwd) {
-      args.push(...WorkdirArgs(cmd.cwd));
+      // Workdir determines the user's current working directory in the container
+      args.push('--workdir', abs(cmd.cwd));
     }
     args.push(IMAGE_NAME, cmd.exe);
 
@@ -44,15 +52,5 @@ export function DockerSpawner(): Spawner {
     };
 
     return translated;
-  }
-
-  // Mount a filesystem volume in the container https://docs.docker.com/storage/volumes/
-  function VolumeArgs() {
-    return ['--volume', `${process.cwd()}:${abs()}`];
-  }
-
-  // Workdir determines the user's current working directory in the container
-  function WorkdirArgs(path = '') {
-    return ['--workdir', abs(path)];
   }
 }
