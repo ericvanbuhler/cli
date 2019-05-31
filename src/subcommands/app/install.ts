@@ -6,6 +6,7 @@ import { appConfigFile } from '../../app-config-file';
 import { spinOnPromise } from '../../spin-on-promise';
 import { JsSpawner } from '../../spawner/js-spawner';
 import { AppInstaller } from '../../app-installer';
+import { echo } from '../../echo';
 
 export const appInstall = createLeaf({
   name: 'install',
@@ -29,7 +30,7 @@ export const appInstall = createLeaf({
     }
 
     if (!hasModels) {
-      console.log(`${LogSymbols.warning} Application has no models`);
+      echo(`${LogSymbols.warning} Application has no models`);
     }
 
     await spinOnPromise(appInstaller.installVirtualenv(), 'Python virtualenv');

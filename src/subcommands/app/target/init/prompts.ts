@@ -10,6 +10,7 @@ import { JsSpawner } from '../../../../spawner/js-spawner';
 import { validatePath, options } from './options';
 import logSymbols = require('log-symbols');
 import ora = require('ora');
+import { echo } from '../../../../echo';
 
 export async function checkForDocker(
   opts: Partial<{ hostname: string; yes: boolean }> = {},
@@ -23,7 +24,7 @@ export async function checkForDocker(
     spinner.succeed();
   } catch (ex) {
     spinner.fail('Command "docker --version" failed.');
-    console.log(ex.message);
+    echo(ex.message);
     await promptToConfirmSave(opts.yes || false);
   }
 }
@@ -89,7 +90,7 @@ export async function promptForHostname(initialValue: string, yes: boolean) {
   } catch (ex) {
     spinner.fail('Connection to target host failed');
     if (ex.message) {
-      console.log(ex.message);
+      echo(ex.message);
     }
     await promptToConfirmSave(yes);
   }
@@ -130,7 +131,7 @@ export async function promptForPath(
     } catch (ex) {
       spinner.fail('Failed to create application directory on target system');
       if (ex.message) {
-        console.log(ex.message);
+        echo(ex.message);
       }
       await promptToConfirmSave(yes);
     }
@@ -141,7 +142,7 @@ export async function promptForPath(
 
 async function promptToConfirmSave(yes: boolean) {
   if (yes) {
-    console.log(
+    echo(
       logSymbols.warning,
       "We'll save this configuration despite failed checks because --yes was passed",
     );

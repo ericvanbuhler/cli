@@ -13,6 +13,7 @@ import {
   promptForHostname,
   checkForDocker,
 } from './prompts';
+import { echo } from '../../../../echo';
 
 export const init = createLeaf({
   name: 'init',
@@ -100,7 +101,7 @@ async function runPromptedInterface({ yes, ...passed }: NamedInputs) {
   }
 
   for (const paragraph of paragraphs) {
-    console.log(`${paragraph}\n`);
+    echo(`${paragraph}\n`);
   }
 
   const protocol = await promptForProtocol(

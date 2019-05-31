@@ -8,6 +8,7 @@ import { yes } from '../../inputs/yes';
 import { appConfigFile } from '../../app-config-file';
 import { prompt, checkTerminalIsInteractive } from '../../prompt';
 import { ASSETS_DIR } from '../../constants';
+import { echo } from '../../echo';
 
 const APP_PY = readFileSync(join(ASSETS_DIR, 'app.py'), {
   encoding: 'utf8',
@@ -30,10 +31,10 @@ export const init = createLeaf({
       throw new TerseError("You're already in an alwaysAI application directory!");
     }
 
-    console.log(
+    echo(
       'Welcome! This command will initialize this directory as an alwaysAI application.',
     );
-    console.log();
+    echo();
 
     const defaultConfig: AppConfig = {
       name: basename(process.cwd()),
@@ -80,15 +81,15 @@ export const init = createLeaf({
         models: {},
       });
     }
-    console.log(`Wrote ${basename(appConfigFile.path)}`);
+    echo(`Wrote ${basename(appConfigFile.path)}`);
     try {
       writeFileSync('app.py', APP_PY, { flag: 'wx' });
-      console.log('Wrote app.py');
+      echo('Wrote app.py');
     } catch (ex) {
       if (ex.code !== 'EEXIST') {
         throw ex;
       }
-      console.log('Found app.py');
+      echo('Found app.py');
     }
   },
 });

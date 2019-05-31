@@ -5,6 +5,7 @@ import { createLeaf, TerseError } from '@alwaysai/alwayscli';
 import { yes } from '../../inputs/yes';
 import { modelConfigFile } from './model-config-file';
 import { checkTerminalIsInteractive } from '../../prompt';
+import { echo } from '../../echo';
 
 type Config = Parameters<typeof modelConfigFile.write>[0];
 
@@ -29,10 +30,8 @@ export const init = createLeaf({
       }
     }
 
-    console.log(
-      'Welcome! This command will initialize this directory as an alwaysAI model.',
-    );
-    console.log();
+    echo('Welcome! This command will initialize this directory as an alwaysAI model.');
+    echo();
 
     const defaultConfig: Config = {
       id: `alwaysai/${basename(process.cwd())}`,

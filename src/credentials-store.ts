@@ -6,8 +6,11 @@ import { ICognitoStorage } from 'amazon-cognito-identity-js';
 
 const codec = t.record(t.string, t.any);
 
+export const PLEASE_LOG_IN_MESSAGE =
+  'Authentication is required for this action. Please run "alwaysai user login"';
+
 const ENOENT = {
-  message: 'Authentication is required for this action. Please run "alwaysai user logIn"',
+  message: PLEASE_LOG_IN_MESSAGE,
   code: 'TERSE',
 };
 
@@ -20,10 +23,11 @@ export const configFile = ConfigFile({
   initialValue: {},
 });
 
-configFile.update(() => {});
+configFile.update(() => {
+  // No-op
+});
 
-export const credentialsStore: ICognitoStorage = {
-  ...configFile,
+const storage: ICognitoStorage = {
   setItem(key: string, value: string) {
     configFile.update(config => {
       config[key] = value;
@@ -41,3 +45,5 @@ export const credentialsStore: ICognitoStorage = {
     configFile.remove();
   },
 };
+
+export const credentialsStore = { ...configFile, ...storage };

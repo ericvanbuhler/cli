@@ -2,6 +2,7 @@ import { createLeaf } from '@alwaysai/alwayscli';
 import { appConfigFile } from '../../../app-config-file';
 import { ids } from '../../../inputs/ids';
 import logSymbols = require('log-symbols');
+import { echo } from '../../../echo';
 
 export const removeModels = createLeaf({
   name: 'remove',
@@ -12,7 +13,7 @@ export const removeModels = createLeaf({
     appConfigFile.read();
     for (const id of ids) {
       appConfigFile.removeModel(id);
-      console.log(`${logSymbols.success} Remove ${id}`);
+      echo(`${logSymbols.success} Remove ${id}`);
     }
   },
 });

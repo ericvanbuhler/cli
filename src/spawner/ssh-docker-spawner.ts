@@ -22,6 +22,7 @@ export function SshDockerSpawner(config: { path: string; hostname: string }) {
       'docker',
       'run',
       '--rm',
+      '--privileged',
       '--interactive',
       '--volume',
       `${config.path}:${APP_DIR}`,

@@ -16,7 +16,7 @@ export const appStart = createLeaf({
     if (!script) {
       throw new TerseError('This application does not define a "start" script');
     }
-    execSync(`source ${join(VENV, 'bin', 'activate')} && ${script}`, {
+    execSync(`. ${join(VENV, 'bin', 'activate')} && ${script}`, {
       stdio: 'inherit',
     });
   },

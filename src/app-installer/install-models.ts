@@ -56,7 +56,6 @@ export function InstallModels(spawner: Spawner) {
         await spawner.untar(await PackageStreamFromCache({ id, version }), tmpDir);
         const fileNames = await spawner.readdir(tmpDir);
         if (fileNames.length !== 1 || !fileNames[0]) {
-          console.log(fileNames);
           throw new Error('Expected package to contain single directory');
         }
         await spawner.rimraf(modelDir);

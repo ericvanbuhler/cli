@@ -3,8 +3,9 @@ import { ErrorCode } from '@alwaysai/cloud-api';
 
 import { appConfigFile } from '../../../app-config-file';
 import { ids } from '../../../inputs/ids';
-import { createRpcClient } from '../../../create-rpc-client';
+import { RpcClient } from '../../../rpc-client';
 import { spinOnPromise } from '../../../spin-on-promise';
+import { echo } from '../../../echo';
 
 export const addModels = createLeaf({
   name: 'add',
@@ -12,7 +13,7 @@ export const addModels = createLeaf({
   args: ids,
   async action(ids) {
     appConfigFile.read();
-    const rpcClient = await createRpcClient();
+    const rpcClient = await RpcClient();
     const checked: [string, string][] = [];
     for (const id of ids) {
       try {
@@ -33,8 +34,8 @@ export const addModels = createLeaf({
     });
 
     const newConfig = appConfigFile.read();
-    console.log('Here is your new model configuration:');
-    console.log();
-    console.log(newConfig);
+    echo('Here is your new model configuration:');
+    echo();
+    echo(newConfig);
   },
 });

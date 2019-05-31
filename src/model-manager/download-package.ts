@@ -6,7 +6,7 @@ import mkdirp = require('mkdirp');
 import pump = require('pump');
 import rimraf = require('rimraf');
 
-import { createRpcClient } from '../create-rpc-client';
+import { RpcClient } from '../rpc-client';
 import { getRandomString } from '../get-random-string';
 import { ModelPackagePath } from './model-package-path';
 import { parsePackageUrl } from './parse-package-url';
@@ -15,7 +15,7 @@ import { S3 } from '../aws-clients';
 const rimrafAsync = promisify(rimraf);
 
 export async function downloadPackage(opts: { id: string; version: string }) {
-  const rpcApi = await createRpcClient();
+  const rpcApi = await RpcClient();
   const { packageUrl } = await rpcApi.getModelVersion(opts);
   const { awsRegion, bucketName, bucketKey } = parsePackageUrl(packageUrl);
   const s3 = S3({ region: awsRegion });

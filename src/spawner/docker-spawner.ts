@@ -27,6 +27,7 @@ export function DockerSpawner(): Spawner {
     const args = [
       'run',
       '--rm',
+      '--privileged',
       '--interactive',
       '--volume',
       `${process.cwd()}:${abs()}`,

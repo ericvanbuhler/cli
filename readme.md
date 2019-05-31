@@ -43,7 +43,7 @@ It should print e.g. `0.2.10`.
 ### Log in
 [Sign up](https://alwaysai.co/signup) for an alwaysAI account and complete the first-time login flow throw the web. Now authenticate yourself with the CLI:
 ```
-$ alwaysai user logIn
+$ alwaysai user login
 ```
 You'll be prompted to enter your username and password. You're ready to start developing your first alwaysAI deep-learning computer vision application!
 

@@ -23,7 +23,7 @@ export const appTargetStart = createLeaf({
       case 'docker:': {
         spawner.runForeground({
           exe: '/bin/bash',
-          args: ['-t', '-c', `source ${join(VENV, 'bin', 'activate')} && ${script}`],
+          args: ['-t', '-c', `. ${join(VENV, 'bin', 'activate')} && ${script}`],
           tty: true,
           cwd: '.',
         });
@@ -34,7 +34,7 @@ export const appTargetStart = createLeaf({
       case 'ssh+docker:': {
         spawner.runForeground({
           exe: '/bin/bash',
-          args: ['-t', '-c', `'source ${join(VENV, 'bin', 'activate')} && ${script}'`],
+          args: ['-t', '-c', `'. ${join(VENV, 'bin', 'activate')} && ${script}'`],
           tty: true,
           cwd: '.',
         });
@@ -42,7 +42,7 @@ export const appTargetStart = createLeaf({
       }
 
       case 'ssh:': {
-        const command = `cd ${spawner.abs()} && source ${join(
+        const command = `cd ${spawner.abs()} && . ${join(
           VENV,
           'bin',
           'activate',

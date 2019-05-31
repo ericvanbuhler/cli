@@ -1,6 +1,6 @@
 import { createLeaf } from '@alwaysai/alwayscli';
 import { modelConfigFile } from './model-config-file';
-import { createRpcClient } from '../../create-rpc-client';
+import { RpcClient } from '../../rpc-client';
 import { parsePackageUrl } from '../../model-manager/parse-package-url';
 import { PackageStreamFromCache } from '../../model-manager/package-stream-from-cache';
 import { PackageStreamFromCwd } from '../../model-manager/package-stream-from-cwd';
@@ -15,7 +15,7 @@ export const publish = createLeaf({
     const config = modelConfigFile.read();
 
     // Create the provisional record in the database and get packageUrl
-    const rpcApi = await createRpcClient();
+    const rpcApi = await RpcClient();
     const modelVersion = await rpcApi.createModelVersion(config);
     await spinOnPromise(
       (async () => {

@@ -4,13 +4,13 @@ import { URL } from 'url';
 
 import { CodedError } from '@carnesen/coded-error';
 import { CLOUD_API_URL, CLOUD_API_RPC_PATH } from '@alwaysai/cloud-api';
-export function createSendRpcData(
+export function SendRpcData(
   config: Partial<{
-    idToken: string;
+    bearerToken?: string;
     cloudApiUrl: string;
   }> = {},
 ) {
-  const { cloudApiUrl = CLOUD_API_URL, idToken } = config;
+  const { cloudApiUrl = CLOUD_API_URL, bearerToken: idToken } = config;
   const { protocol, hostname, port } = new URL(cloudApiUrl);
 
   const headers: http.OutgoingHttpHeaders = {
