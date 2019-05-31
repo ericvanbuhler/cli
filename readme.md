@@ -71,17 +71,17 @@ TODO PYTHON
 ### Add a model to your application configuration
 You can add a model to your application using the command-line interface like so:
 ```
-$ alwaysai app models add @alwaysai/MobileNetSSD
-Added @alwaysai/MobileNetSSD
+$ alwaysai app models add alwaysai/MobileNetSSD
+Added alwaysai/MobileNetSSD
 ```
 Now you'll see in your application config file:
 
 ```json
 {
-  "id": "@alice/my-app",
+  "id": "alice/my-app",
   "version": "0.0.0",
   "models": {
-    "@alwaysai/MobileNetSSD": "4.0.8"
+    "alwaysai/MobileNetSSD": "4.0.8"
   },
 }
 ```
