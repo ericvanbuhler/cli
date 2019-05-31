@@ -40,12 +40,12 @@ export function JsSpawner(context: { path?: string } = {}): Spawner {
     return translated;
   }
 
-  function mkdirp(path = '') {
-    return promisify(mkdirpJs)(abs(path));
+  async function mkdirp(path = '') {
+    await promisify(mkdirpJs)(abs(path));
   }
 
-  function rimraf(path = '') {
-    return promisify(rimrafJs)(abs(path));
+  async function rimraf(path = '') {
+    await promisify(rimrafJs)(abs(path));
   }
 
   function readdir(path = '') {
