@@ -31,6 +31,8 @@ export function DockerSpawner(): Spawner {
       '--interactive',
       '--network=host',
       '--volume',
+      '/dev:/dev',
+      '--volume',
       `${process.cwd()}:${abs()}`,
     ];
     // ^^ --volume mounts the current working directory into the container
