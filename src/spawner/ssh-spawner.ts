@@ -17,7 +17,7 @@ export function SshSpawner(config: { path: string; hostname: string }) {
 
   function translate(cmd: Cmd) {
     const exe = 'ssh';
-    const args: string[] = ['-L 5000:localhost:5000'];
+    const args: string[] = ['-L 5000:0.0.0.0:5000'];
     if (cmd.tty) {
       args.push('-t');
     }

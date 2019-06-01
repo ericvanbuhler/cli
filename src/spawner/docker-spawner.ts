@@ -3,8 +3,7 @@ import { SpawnerBase } from './spawner-base';
 import { GnuSpawner } from './gnu-spawner';
 import { resolve } from 'path';
 
-//export const IMAGE_NAME = 'alwaysai/edgeiq';
-export const IMAGE_NAME = 'sandbox';
+export const IMAGE_NAME = 'alwaysai/edgeiq';
 export const APP_DIR = '/app';
 
 export function DockerSpawner(): Spawner {
@@ -30,17 +29,11 @@ export function DockerSpawner(): Spawner {
       '--rm',
       '--privileged',
       '--interactive',
+      '--network=host',
       '--volume',
       `${process.cwd()}:${abs()}`,
     ];
     // ^^ --volume mounts the current working directory into the container
-    args.push('--privileged');
-    args.push('-v');
-    args.push('/dev:/dev');
-    args.push('-p');
-    args.push('5000:5000');
-    args.push('--network=host');
-
     if (cmd.tty) {
       args.push('--tty');
     }

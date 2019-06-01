@@ -17,13 +17,14 @@ export function SshDockerSpawner(config: { path: string; hostname: string }) {
 
   function translate(cmd: Cmd) {
     const exe = 'ssh';
-    const sshArgs: string[] = [];
+    const sshArgs: string[] = ['-L 5000:0.0.0.0:5000'];
     const dockerArgs: string[] = [
       'docker',
       'run',
       '--rm',
       '--privileged',
       '--interactive',
+      '--network=host',
       '--volume',
       `${config.path}:${APP_DIR}`,
     ];
